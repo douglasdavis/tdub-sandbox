@@ -1,6 +1,9 @@
 .DS_Store
 *.sub
-
+*.condor
+job.err.*
+job.out.*
+scan_output_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
