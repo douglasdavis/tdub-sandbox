@@ -4,6 +4,7 @@
 job.err.*
 job.out.*
 scan_output_*
+fold_*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
