@@ -6,10 +6,11 @@ import pathlib
 import argparse
 
 ## pip
-import numpy as np
-import pygram11 as pg
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
+import pygram11 as pg
+import yaml
 
 ## tdub
 from tdub.utils import (
@@ -23,7 +24,42 @@ from tdub.frames import raw_dataframe
 
 
 mpl.use("Agg")
+mpl.rcParams["figure.figsize"] = (6, 5.25)
+mpl.rcParams["axes.labelsize"] = 14
+mpl.rcParams["font.size"] = 12
+mpl.rcParams["xtick.top"] = True
+mpl.rcParams["ytick.right"] = True
+mpl.rcParams["xtick.direction"] = "in"
+mpl.rcParams["ytick.direction"] = "in"
+mpl.rcParams["xtick.labelsize"] = 12
+mpl.rcParams["ytick.labelsize"] = 12
+mpl.rcParams["xtick.minor.visible"] = True
+mpl.rcParams["ytick.minor.visible"] = True
+mpl.rcParams["xtick.major.width"] = 0.8
+mpl.rcParams["xtick.minor.width"] = 0.8
+mpl.rcParams["xtick.major.size"] = 7.0
+mpl.rcParams["xtick.minor.size"] = 4.0
+mpl.rcParams["xtick.major.pad"] = 1.5
+mpl.rcParams["xtick.minor.pad"] = 1.4
+mpl.rcParams["ytick.major.width"] = 0.8
+mpl.rcParams["ytick.minor.width"] = 0.8
+mpl.rcParams["ytick.major.size"] = 7.0
+mpl.rcParams["ytick.minor.size"] = 4.0
+mpl.rcParams["ytick.major.pad"] = 1.5
+mpl.rcParams["ytick.minor.pad"] = 1.4
+mpl.rcParams["legend.frameon"] = False
+mpl.rcParams["legend.numpoints"] = 1
+mpl.rcParams["legend.fontsize"] = 11
+mpl.rcParams["legend.handlelength"] = 1.5
+mpl.rcParams["axes.formatter.limits"] = [-4, 4]
+mpl.rcParams["axes.formatter.use_mathtext"] = True
+
+
 DESIRED_SAMPLES = ["tW_DR", "ttbar", "Zjets", "Diboson", "MCNP", "Data"]
+
+
+with open("meta.yaml") as f:
+    META = yaml.load(f, Loader=yaml.Loader)
 
 
 def parse_args():
@@ -36,7 +72,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def ahist(frames, variable, binning, fsuffix):
+def ahist(frames, variable, binning, logy, fprefix):
     bins, start, stop = binning
     bedges = np.linspace(start, stop, bins + 1)
     bcenters = bin_centers(bedges)
@@ -54,13 +90,14 @@ def ahist(frames, variable, binning, fsuffix):
             counts_mc += count
             err_mc += err ** 2
     err_mc = np.sqrt(err_mc)
-    plot(variable, binning, counts, errs, counts_mc, err_mc, f"{variable}_{fsuffix}.pdf")
+    plot(variable, binning, counts, errs, counts_mc, err_mc, logy, f"{fprefix}_{variable}.pdf")
 
 
-def plot(variable, binning, counts, errs, counts_mc, err_mc, fname):
+def plot(variable, binning, counts, errs, counts_mc, err_mc, logy, fname):
     bins, start, stop = binning
     bedges = np.linspace(start, stop, bins + 1)
     bcenters = bin_centers(bedges)
+    width = round(bedges[1] - bedges[0], 2)
 
     ratio = counts["Data"] / counts_mc
     ratio_err = counts["Data"] / (counts_mc ** 2) + np.power(
@@ -86,7 +123,7 @@ def plot(variable, binning, counts, errs, counts_mc, err_mc, fname):
         ],
         histtype="stepfilled",
         stacked=True,
-        label=["MCNP", "Diboson", "Z+jets", "ttbar", "tW"],
+        label=["MCNP", "Diboson", "$Z$+jets", "$t\\bar{t}$", "$tW$"],
         color=["#9467bd", "#ff7f0e", "#2ca02c", "#d62728", "#1f77b4"],
     )
     ax.errorbar(
@@ -96,16 +133,27 @@ def plot(variable, binning, counts, errs, counts_mc, err_mc, fname):
     axr.errorbar(bcenters, ratio, yerr=ratio_err, fmt="ko", zorder=501)
     axr.set_ylim([0.8, 1.2])
     axr.set_yticks([0.9, 1.0, 1.1])
-    axr.set_xlabel(variable, horizontalalignment="right", x=1.0)
+    xlabel = "{} [{}]".format(
+        META["titles"][variable]["mpl"], META["titles"][variable]["unit"]
+    )
+    xlabel = xlabel.replace(" []", "")
+    axr.set_xlabel(xlabel, horizontalalignment="right", x=1.0)
+    ylabel = "Events/{} {}".format(width, META["titles"][variable]["unit"])
+    ax.set_ylabel(ylabel, horizontalalignment="right", y=1.0)
+    axr.set_ylabel("Data/MC")
 
     ax.legend(loc="upper right")
     handles, labels = ax.get_legend_handles_labels()
     handles.insert(0, handles.pop())
     labels.insert(0, labels.pop())
     ax.legend(handles, labels, loc="upper right", ncol=1)
-
-    ax.set_ylim([0, ax.get_ylim()[1] * 1.35])
+    if logy:
+        ax.set_yscale("log")
+        ax.set_ylim([10, ax.get_ylim()[1] * 100])
+    else:
+        ax.set_ylim([0, ax.get_ylim()[1] * 1.35])
     ax.set_xlim([start, stop])
+    fig.subplots_adjust(left=0.115, bottom=0.115, right=0.965, top=0.95)
     fig.savefig(fname)
     plt.close(fig)
 
@@ -143,24 +191,15 @@ def main():
     outdir.mkdir(exist_ok=True)
     os.chdir(outdir)
 
-    ahist(frames1j1b, "met", (40, 0, 200), "1j1b")
-    ahist(frames2j1b, "met", (40, 0, 200), "2j1b")
-    ahist(frames2j2b, "met", (40, 0, 200), "2j2b")
-
-    ahist(frames1j1b, "pT_lep1", (40, 27, 227), "1j1b")
-    ahist(frames2j1b, "pT_lep1", (40, 27, 227), "2j1b")
-    ahist(frames2j2b, "pT_lep1", (40, 27, 227), "2j2b")
-
-    ahist(frames1j1b, "pT_jet1", (40, 25, 225), "1j1b")
-    ahist(frames2j1b, "pT_jet1", (40, 25, 225), "2j1b")
-    ahist(frames2j2b, "pT_jet1", (40, 25, 225), "2j2b")
-
-    ahist(frames1j1b, "pT_lep2", (40, 20, 140), "1j1b")
-    ahist(frames2j1b, "pT_lep2", (40, 20, 140), "2j1b")
-    ahist(frames2j2b, "pT_lep2", (40, 20, 140), "2j2b")
-
-    ahist(frames2j1b, "pT_jet2", (40, 25, 175), "2j1b")
-    ahist(frames2j2b, "pT_jet2", (40, 25, 175), "2j2b")
+    for entry in META["regions"]["r1j1b"]:
+        binning = (entry["nbins"], entry["xmin"], entry["xmax"])
+        ahist(frames1j1b, entry["var"], binning, entry["log"], "1j1b")
+    for entry in META["regions"]["r2j1b"]:
+        binning = (entry["nbins"], entry["xmin"], entry["xmax"])
+        ahist(frames2j1b, entry["var"], binning, entry["log"], "2j1b")
+    for entry in META["regions"]["r2j2b"]:
+        binning = (entry["nbins"], entry["xmin"], entry["xmax"])
+        ahist(frames2j2b, entry["var"], binning, entry["log"], "2j2b")
 
     os.chdir(curdir)
 
