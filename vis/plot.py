@@ -229,6 +229,7 @@ def parse_args():
     parser.add_argument("-r", "--apply-tptrw", action="store_true", help="apply top pt reweighting")
     parser.add_argument("-p", "--from-parquet", action="store_true", help="use parquet files")
     parser.add_argument("--prep-parquet", action="store_true", help="data prep to parquet")
+    parser.add_argument("--regions", type=str, nargs="+", help="regions to plot", default=["2j2b", "2j1b", "1j1b"])
     # fmt: on
     return parser.parse_args()
 
@@ -270,15 +271,18 @@ def main():
     outdir.mkdir(exist_ok=True)
     os.chdir(outdir)
 
-    for entry in META["regions"]["r1j1b"]:
-        binning = (entry["nbins"], entry["xmin"], entry["xmax"])
-        plot_from_region_frames(dfs_1j1b, entry["var"], binning, "1j1b", entry["log"])
-    for entry in META["regions"]["r2j1b"]:
-        binning = (entry["nbins"], entry["xmin"], entry["xmax"])
-        plot_from_region_frames(dfs_2j1b, entry["var"], binning, "2j1b", entry["log"])
-    for entry in META["regions"]["r2j2b"]:
-        binning = (entry["nbins"], entry["xmin"], entry["xmax"])
-        plot_from_region_frames(dfs_2j2b, entry["var"], binning, "2j2b", entry["log"])
+    if "1j1b" in args.regions:
+        for entry in META["regions"]["r1j1b"]:
+            binning = (entry["nbins"], entry["xmin"], entry["xmax"])
+            plot_from_region_frames(dfs_1j1b, entry["var"], binning, "1j1b", entry["log"])
+    if "2j1b" in args.regions:
+        for entry in META["regions"]["r2j1b"]:
+            binning = (entry["nbins"], entry["xmin"], entry["xmax"])
+            plot_from_region_frames(dfs_2j1b, entry["var"], binning, "2j1b", entry["log"])
+    if "2j2b" in args.regions:
+        for entry in META["regions"]["r2j2b"]:
+            binning = (entry["nbins"], entry["xmin"], entry["xmax"])
+            plot_from_region_frames(dfs_2j2b, entry["var"], binning, "2j2b", entry["log"])
 
     os.chdir(curdir)
 

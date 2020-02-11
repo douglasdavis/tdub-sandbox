@@ -48,52 +48,52 @@ titles:
     rex: "b-tag bin (jet2)"
     unit: ""
   HT_lep1lep2jet1met:
-    mpl: "$H_{T}(\\ell_1\\ell_2j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    mpl: "$H_\\mathrm{T}(\\ell_1\\ell_2j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
+    rex: "#it{H}_{T}(lep1, lep2, jet1, #it{E}_{T}^{miss})"
     unit: "GeV"
   HT_lep1lep2jet1jet2met:
-    mpl: "$H_{T}(\\ell_1\\ell_2j_1j_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    mpl: "$H_{\\mathrm{T}}(\\ell_1\\ell_2j_1j_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
+    rex: "#it{H}_{T}(lep1, lep2, jet1, jet2, #it{E}_{T}^{miss})"
     unit: "GeV"
   HT_jet1jet2:
-    mpl: "$H_{T}(j_1j_2)$"
-    rex: ""
-    unit: ""
+    mpl: "$H_{\\mathrm{T}}(j_1j_2)$"
+    rex: "#it{H}_{T}(jet1, jet2)"
+    unit: "GeV"
   HTratio_lep1lep2_lep1lep2jet1met:
-    mpl: ""
-    rex: ""
+    mpl: "$\\left. H_{\\mathrm{T}}(\\ell_1\\ell_2) \\right/ H_{\\mathrm{T}}(\\ell_1\\ell_2j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
+    rex: "#it{H}_{T}(lep1, lep2) / #it{H}_{T}(lep1, lep2, jet1, #{E}_{T}^{miss})"
     unit: ""
   HTratio_lep1lep2_lep1lep2jet1jet2met:
-    mpl: ""
-    rex: ""
+    mpl: "$\\left. H_{\\mathrm{T}}(\\ell_1\\ell_2) \\right/ H_{\\mathrm{T}}(\\ell_1\\ell_2j_1j_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
+    rex: "#it{H}_{T}(lep1lep2) / #it{H}_{T}(lep1lep2jet1jet2#{E}_{T}^{miss})"
     unit: ""
   cent_lep1lep2:
     mpl: "Centrality($\\ell_1\\ell_2$)"
-    rex: ""
+    rex: "Centrality(lep1, lep2)"
     unit: ""
   cent_lep1met:
-    mpl: ""
-    rex: ""
+    mpl: "Centrality($\\ell_1 E_{\\mathrm{T}}^{\\mathrm{miss}}$)"
+    rex: "Centrality(lep1#it{E}_{T}^{miss})"
     unit: ""
   cent_lep1lep2jet1:
-    mpl: ""
-    rex: ""
+    mpl: "Centrality($\\ell_1\\ell_2j_1$)"
+    rex: "Centrality(lep1lep2jet1)"
     unit: ""
   deltaR_jet1_jet2:
-    mpl: ""
-    rex: ""
+    mpl: "$\\Delta R (j_1, j_2)$"
+    rex: "#Delta R(jet1, jet2)"
     unit: ""
   deltaR_lep1_jet1:
-    mpl: ""
-    rex: ""
+    mpl: "$\\Delta R (\\ell_1, j_1)$"
+    rex: "#Delta R(lep1, jet1)"
     unit: ""
   deltaR_lep1_jet2:
-    mpl: ""
-    rex: ""
+    mpl: "$\\Delta R (\\ell_1, j_2)$"
+    rex: "#Delta R(lep1, jet2)"
     unit: ""
   deltaR_lep1_lep2:
-    mpl: ""
-    rex: ""
+    mpl: "$\\Delta R (\\ell_1, \\ell_2)$"
+    rex: "#Delta R(lep1, lep2)"
     unit: ""
   deltaR_lep1lep2_jet1jet2:
     mpl: ""
@@ -281,7 +281,8 @@ regions:
     - { var: met, nbins: 40, xmin: 0, xmax: 200, log: false }
     - { var: nsoftjets, nbins: 4, xmin: -0.5, xmax: 3.5, log: true }
     - { var: nsoftbjets, nbins: 3, xmin: -0.5, xmax: 2.5, log: true }
-    - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 120, xmax: 520, log: false }
+    - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 100, xmax: 540, log: false }
+    - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.15, xmax: 0.85, log: false}
   r2j1b:
     - { var: pT_lep1, nbins: 40, xmin: 27.0, xmax: 227.0, log: false }
     - { var: pT_lep2, nbins: 40, xmin: 20.0, xmax: 160.0, log: false }
@@ -290,8 +291,9 @@ regions:
     - { var: met, nbins: 40, xmin: 0, xmax: 200, log: false }
     - { var: nsoftjets, nbins: 4, xmin: -0.5, xmax: 3.5, log: true }
     - { var: nsoftbjets, nbins: 3, xmin: -0.5, xmax: 2.5, log: true }
-    - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 120, xmax: 520, log: false }
-    - { var: HT_lep1lep2jet1jet2met, nbins: 40, xmin: 120, xmax: 520, log: false }
+    - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 120, xmax: 580, log: false }
+    - { var: HT_lep1lep2jet1jet2met, nbins: 40, xmin: 160, xmax: 780, log: false }
+    - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.15, xmax: 0.8, log: false}
   r2j2b:
     - { var: pT_lep1, nbins: 40, xmin: 27.0, xmax: 227.0, log: false }
     - { var: pT_lep2, nbins: 40, xmin: 20.0, xmax: 160.0, log: false }
@@ -299,4 +301,5 @@ regions:
     - { var: pT_jet2, nbins: 40, xmin: 25.0, xmax: 175.0, log: false }
     - { var: met, nbins: 40, xmin: 0, xmax: 200, log: false }
     - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 120, xmax: 520, log: false }
-    - { var: HT_lep1lep2jet1jet2met, nbins: 40, xmin: 120, xmax: 520, log: false }
+    - { var: HT_lep1lep2jet1jet2met, nbins: 40, xmin: 200, xmax: 800, log: false }
+    - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.2, xmax: 0.8, log: false}
