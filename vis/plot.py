@@ -17,6 +17,7 @@ import pygram11 as pg
 import yaml
 
 ## tdub
+from tdub.art import setup_style, canvas_from_counts
 from tdub.utils import (
     quick_files,
     get_branches,
@@ -27,45 +28,14 @@ from tdub.utils import (
 from tdub.frames import raw_dataframe
 from tdub import setup_logging
 
+setup_style()
 setup_logging()
 
 log = logging.getLogger("plot.py")
 
 
-mpl.use("Agg")
-mpl.rcParams["figure.figsize"] = (6, 5.25)
-mpl.rcParams["axes.labelsize"] = 14
-mpl.rcParams["font.size"] = 12
-mpl.rcParams["xtick.top"] = True
-mpl.rcParams["ytick.right"] = True
-mpl.rcParams["xtick.direction"] = "in"
-mpl.rcParams["ytick.direction"] = "in"
-mpl.rcParams["xtick.labelsize"] = 12
-mpl.rcParams["ytick.labelsize"] = 12
-mpl.rcParams["xtick.minor.visible"] = True
-mpl.rcParams["ytick.minor.visible"] = True
-mpl.rcParams["xtick.major.width"] = 0.8
-mpl.rcParams["xtick.minor.width"] = 0.8
-mpl.rcParams["xtick.major.size"] = 7.0
-mpl.rcParams["xtick.minor.size"] = 4.0
-mpl.rcParams["xtick.major.pad"] = 1.5
-mpl.rcParams["xtick.minor.pad"] = 1.4
-mpl.rcParams["ytick.major.width"] = 0.8
-mpl.rcParams["ytick.minor.width"] = 0.8
-mpl.rcParams["ytick.major.size"] = 7.0
-mpl.rcParams["ytick.minor.size"] = 4.0
-mpl.rcParams["ytick.major.pad"] = 1.5
-mpl.rcParams["ytick.minor.pad"] = 1.4
-mpl.rcParams["legend.frameon"] = False
-mpl.rcParams["legend.numpoints"] = 1
-mpl.rcParams["legend.fontsize"] = 11
-mpl.rcParams["legend.handlelength"] = 1.5
-mpl.rcParams["axes.formatter.limits"] = [-4, 4]
-mpl.rcParams["axes.formatter.use_mathtext"] = True
-
-
 META_FILE = open("meta.yaml", "r")
-DESIRED_SAMPLES = ["tW_DR", "ttbar", "Zjets", "Diboson", "MCNP", "Data"]
+ALL_SAMPLES = ["tW_DR", "ttbar", "Zjets", "Diboson", "MCNP", "Data"]
 LUMI = 139.0
 META = yaml.load(META_FILE, Loader=yaml.Loader)
 META_FILE.close()
@@ -120,72 +90,7 @@ def set_labels(ax: plt.Axes, axr: plt.Axes, variable: str, width: float) -> None
     axr.set_ylabel("Data/MC")
 
 
-def fig_from_counts(
-    counts: Dict[str, np.ndarray], errors: Dict[str, np.ndarray], bin_edges: np.ndarray,
-) -> Tuple[plt.Figure, plt.Axes, plt.Axes]:
-    """create a histogram plot given a set of counts and bin edges
-
-    Parameters
-    ----------
-    counts : dict(str, np.ndarray)
-        a dictionary pairing samples to bin counts
-    errors : dict(str, np.ndarray)
-        a dictionray pairing samples to bin count errors
-    bin_edges : np.ndarray
-        the histogram bin edges
-
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
-        the matplotlib figure
-    ax : matplotlib.axes.Axes
-        the matplotlib axes for the histogram stack
-    axr : matplotlib.axes.Axes
-        the matplotlib axes for the ratio comparison
-    """
-    centers = bin_centers(bin_edges)
-    start, stop = bin_edges[0], bin_edges[-1]
-    mc_counts = np.zeros_like(centers, dtype=np.float32)
-    mc_errs = np.zeros_like(centers, dtype=np.float32)
-    for key in counts.keys():
-        if key != "Data":
-            mc_counts += counts[key]
-            mc_errs += errors[key] ** 2
-    mc_errs = np.sqrt(mc_errs)
-    ratio = counts["Data"] / mc_counts
-    ratio_err = counts["Data"] / (mc_counts ** 2) + np.power(
-        counts["Data"] * mc_errs / (mc_counts ** 2), 2
-    )
-    fig, (ax, axr) = plt.subplots(
-        2, 1, sharex=True, gridspec_kw=dict(height_ratios=[3.25, 1], hspace=0.025),
-    )
-    ax.hist(
-        [centers for _ in range(5)],
-        bins=bin_edges,
-        weights=[
-            counts["MCNP"],
-            counts["Diboson"],
-            counts["Zjets"],
-            counts["ttbar"],
-            counts["tW_DR"],
-        ],
-        histtype="stepfilled",
-        stacked=True,
-        label=["MCNP", "Diboson", "$Z$+jets", "$t\\bar{t}$", "$tW$"],
-        color=["#9467bd", "#ff7f0e", "#2ca02c", "#d62728", "#1f77b4"],
-    )
-    ax.errorbar(
-        centers, counts["Data"], yerr=errors["Data"], label="Data", fmt="ko", zorder=500
-    )
-    axr.plot([start, stop], [1.0, 1.0], color="gray", linestyle="solid", marker=None)
-    axr.errorbar(centers, ratio, yerr=ratio_err, fmt="ko", zorder=501)
-    axr.set_ylim([0.75, 1.25])
-    axr.set_yticks([0.8, 0.9, 1.0, 1.1, 1.2])
-
-    return fig, ax, axr
-
-
-def fig_from_frames(frames, variable, binning) -> Tuple[plt.Figure, plt.Axes, plt.Axes]:
+def canvas_from_frames(frames, variable, binning) -> Tuple[plt.Figure, plt.Axes, plt.Axes]:
     """create a histogram plot from dataframes
 
     Parameters
@@ -211,14 +116,14 @@ def fig_from_frames(frames, variable, binning) -> Tuple[plt.Figure, plt.Axes, pl
     bin_edges = np.linspace(start, stop, nbins + 1)
     counts = {}
     errors = {}
-    for ds in DESIRED_SAMPLES:
-        x = frames[ds][variable].to_numpy()
-        w = frames[ds]["weight_nominal"].to_numpy()
+    for samp in ALL_SAMPLES:
+        x = frames[samp][variable].to_numpy()
+        w = frames[samp]["weight_nominal"].to_numpy()
         count, err = pg.histogram(x, bins=nbins, range=(start, stop), weights=w, flow=True)
-        counts[ds] = count
-        errors[ds] = err
+        counts[samp] = count
+        errors[samp] = err
 
-    return fig_from_counts(counts, errors, bin_edges)
+    return canvas_from_counts(counts, errors, bin_edges)
 
 
 def plot_from_region_frames(frames, variable, binning, region_label, logy=False) -> None:
@@ -238,7 +143,7 @@ def plot_from_region_frames(frames, variable, binning, region_label, logy=False)
         if true set the yscale to log
 
     """
-    fig, ax, axr = fig_from_frames(frames, variable, binning)
+    fig, ax, axr = canvas_from_frames(frames, variable, binning)
     nbins, start, stop = binning
     width = round((stop - start) / nbins, 2)
     set_labels(ax, axr, variable, width=width)
@@ -288,21 +193,21 @@ def region_frames_from_qf(
     log.info("reading data from disk")
     frames = {
         name: raw_dataframe(qf_result[name], branches=branches, drop_weight_sys=True)
-        for name in DESIRED_SAMPLES
+        for name in ALL_SAMPLES
     }
     log.info("determing selections")
-    for ds in DESIRED_SAMPLES:
-        if ds != "Data":
-            frames[ds]["weight_nominal"] *= LUMI
-        if apply_tptrw and ds == "ttbar":
+    for samp in ALL_SAMPLES:
+        if samp != "Data":
+            frames[samp]["weight_nominal"] *= LUMI
+        if apply_tptrw and samp == "ttbar":
             log.info("applying top pt reweighting")
-            frames[ds].apply_weight_tptrw()
-        masks1j1b[ds] = frames[ds].eval(get_selection("1j1b"))
-        masks2j1b[ds] = frames[ds].eval(get_selection("2j1b"))
-        masks2j2b[ds] = frames[ds].eval(get_selection("2j2b"))
-        frames1j1b[ds] = frames[ds][masks1j1b[ds]]
-        frames2j1b[ds] = frames[ds][masks2j1b[ds]]
-        frames2j2b[ds] = frames[ds][masks2j2b[ds]]
+            frames[samp].apply_weight_tptrw()
+        masks1j1b[samp] = frames[samp].eval(get_selection("1j1b"))
+        masks2j1b[samp] = frames[samp].eval(get_selection("2j1b"))
+        masks2j2b[samp] = frames[samp].eval(get_selection("2j2b"))
+        frames1j1b[samp] = frames[samp][masks1j1b[samp]]
+        frames2j1b[samp] = frames[samp][masks2j1b[samp]]
+        frames2j2b[samp] = frames[samp][masks2j2b[samp]]
 
     return frames1j1b, frames2j1b, frames2j2b
 
@@ -322,17 +227,46 @@ def parse_args():
                         default="/Users/ddavis/ATLAS/data/wtloop/v29_20200201", help="data directory")
     parser.add_argument("-o", "--output-dir", type=str, default=".", help="directory to store output")
     parser.add_argument("-r", "--apply-tptrw", action="store_true", help="apply top pt reweighting")
+    parser.add_argument("-p", "--from-parquet", action="store_true", help="use parquet files")
+    parser.add_argument("--prep-parquet", action="store_true", help="data prep to parquet")
     # fmt: on
     return parser.parse_args()
 
 
 def main():
+    curdir = pathlib.PosixPath(__file__).parent.resolve()
+    datadir = curdir / "data"
+    datadir.mkdir(exist_ok=True)
+
     args = parse_args()
-    qf = quick_files(args.data_dir)
-    dfs_1j1b, dfs_2j1b, dfs_2j2b = region_frames_from_qf(qf)
-    log.info("frames prepared; starting plotting")
+
+    if args.from_parquet:
+        log.info("reading parquet files")
+        dfs_1j1b, dfs_2j1b, dfs_2j2b = {}, {}, {}
+        for samp in ALL_SAMPLES:
+            dfs_1j1b[samp] = pd.read_parquet(datadir / f"{samp}_1j1b.parquet")
+            dfs_2j1b[samp] = pd.read_parquet(datadir / f"{samp}_2j1b.parquet")
+            dfs_2j2b[samp] = pd.read_parquet(datadir / f"{samp}_2j2b.parquet")
+        log.info("done reading parquet files")
+
+    else:
+        qf = quick_files(args.data_dir)
+        dfs_1j1b, dfs_2j1b, dfs_2j2b = region_frames_from_qf(qf)
+        if args.prep_parquet:
+            log.info("preping parquet files")
+            for k, v in dfs_1j1b.items():
+                name = datadir / f"{k}_1j1b.parquet"
+                v.to_parquet(name)
+            for k, v in dfs_2j1b.items():
+                name = datadir / f"{k}_2j1b.parquet"
+                v.to_parquet(name)
+            for k, v in dfs_2j2b.items():
+                name = datadir / f"{k}_2j2b.parquet"
+                v.to_parquet(name)
+            log.info("dont prepping parquet")
+            exit(0)
+
     outdir = pathlib.PosixPath(args.output_dir)
-    curdir = pathlib.PosixPath.cwd()
     outdir.mkdir(exist_ok=True)
     os.chdir(outdir)
 

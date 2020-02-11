@@ -298,7 +298,5 @@ regions:
     - { var: pT_jet1, nbins: 40, xmin: 25.0, xmax: 225.0, log: false }
     - { var: pT_jet2, nbins: 40, xmin: 25.0, xmax: 175.0, log: false }
     - { var: met, nbins: 40, xmin: 0, xmax: 200, log: false }
-    - { var: nsoftjets, nbins: 4, xmin: -0.5, xmax: 3.5, log: true }
-    - { var: nsoftbjets, nbins: 3, xmin: -0.5, xmax: 2.5, log: true }
     - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 120, xmax: 520, log: false }
     - { var: HT_lep1lep2jet1jet2met, nbins: 40, xmin: 120, xmax: 520, log: false }
