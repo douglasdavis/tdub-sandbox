@@ -90,40 +90,58 @@ def set_labels(ax: plt.Axes, axr: plt.Axes, variable: str, width: float) -> None
     axr.set_ylabel("Data/MC")
 
 
-def canvas_from_frames(frames, variable, binning) -> Tuple[plt.Figure, plt.Axes, plt.Axes]:
-    """create a histogram plot from dataframes
+def save_and_close(fig: plt.Figure, name: str) -> None:
+    """save a figure and close it
 
     Parameters
     ----------
-    frames : dict(str, pd.DataFrame)
-        the dataframes for all samples
+    fig : :obj:`matplotlib.figure.Figure`
+        the matplotlib figure to save
+    name : str
+        the filename to give the saved figure
+    """
+    fig.savefig(name)
+    plt.close(fig)
+
+
+def tune_axes(
+    ax: plt.Axes,
+    axr: plt.Axes,
+    variable: str,
+    binning: Tuple[int, float, float],
+    logy: bool = False,
+    linscale: float = 1.4,
+    logscale: float = 100,
+) -> None:
+    """tune up the axes properties
+
+    Parameters
+    ----------
+    ax : :obj:`matplotlib.axes.Axes`
+        the main stack axes
+    axr : :obj:`matplotlib.axes.Axes`
+        the ratio axes
     variable : str
-        the variable we want to histogram
+        the name for the variable that is histogrammed
     binning : tuple(int, float, float)
-        the bin definition
-
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
-        the matplotlib figure
-    ax : matplotlib.axes.Axes
-        the matplotlib axes for the histogram stack
-    axr : matplotlib.axes.Axes
-        the matplotlib axes for the ratio comparison
-
+        the number of bins and the start and stop on the x-axis
+    logy : bool
+        set the yscale to log
+    linscale : float
+        the factor to scale up the y-axis when linear
+    logscale : float
+        the factor to scale up the y-axis when log
     """
     nbins, start, stop = binning
-    bin_edges = np.linspace(start, stop, nbins + 1)
-    counts = {}
-    errors = {}
-    for samp in ALL_SAMPLES:
-        x = frames[samp][variable].to_numpy()
-        w = frames[samp]["weight_nominal"].to_numpy()
-        count, err = pg.histogram(x, bins=nbins, range=(start, stop), weights=w, flow=True)
-        counts[samp] = count
-        errors[samp] = err
-
-    return canvas_from_counts(counts, errors, bin_edges)
+    width = round((stop - start) / nbins, 2)
+    set_labels(ax, axr, variable, width=width)
+    ax.set_xlim([start, stop])
+    axr.set_xlim([start, stop])
+    if logy:
+        ax.set_yscale("log")
+        ax.set_ylim([10, ax.get_ylim()[1] * logscale])
+    else:
+        ax.set_ylim([0, ax.get_ylim()[1] * linscale])
 
 
 def plot_from_region_frames(frames, variable, binning, region_label, logy=False) -> None:
@@ -143,27 +161,31 @@ def plot_from_region_frames(frames, variable, binning, region_label, logy=False)
         if true set the yscale to log
 
     """
-    fig, ax, axr = canvas_from_frames(frames, variable, binning)
     nbins, start, stop = binning
-    width = round((stop - start) / nbins, 2)
-    set_labels(ax, axr, variable, width=width)
-    draw_atlas_label(ax, extra_lines=["$\sqrt{s} = 13$ TeV, $L = 139$ fb$^{-1}$", region_label])
-    ax.set_xlim([start, stop])
-    axr.set_xlim([start, stop])
+    bin_edges = np.linspace(start, stop, nbins + 1)
+    counts = {}
+    errors = {}
+    for samp in ALL_SAMPLES:
+        x = frames[samp][variable].to_numpy()
+        w = frames[samp]["weight_nominal"].to_numpy()
+        count, err = pg.histogram(x, bins=nbins, range=(start, stop), weights=w, flow=True)
+        counts[samp] = count
+        errors[samp] = err
+    fig, ax, axr = canvas_from_counts(counts, errors, bin_edges)
+
+    draw_atlas_label(
+        ax, extra_lines=["$\sqrt{s} = 13$ TeV, $L = 139$ fb$^{-1}$", region_label]
+    )
+    tune_axes(ax, axr, variable, binning, logy=logy)
+
     ax.legend(loc="upper right")
     handles, labels = ax.get_legend_handles_labels()
     handles.insert(0, handles.pop())
     labels.insert(0, labels.pop())
     ax.legend(handles, labels, loc="upper right", ncol=1)
-    if logy:
-        ax.set_yscale("log")
-        ax.set_ylim([10, ax.get_ylim()[1] * 100])
-    else:
-        ax.set_ylim([0, ax.get_ylim()[1] * 1.35])
+
     fig.subplots_adjust(left=0.115, bottom=0.115, right=0.965, top=0.95)
-    fname = f"{region_label}_{variable}.pdf"
-    fig.savefig(fname)
-    plt.close(fig)
+    return fig, ax, axr
 
 
 def region_frames_from_qf(
@@ -225,7 +247,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="make some plots")
     parser.add_argument("-d", "--data-dir", type=str,
                         default="/Users/ddavis/ATLAS/data/wtloop/v29_20200201", help="data directory")
-    parser.add_argument("-o", "--output-dir", type=str, default=".", help="directory to store output")
+    parser.add_argument("-o", "--output-dir", type=str, default="pdfs", help="directory to store output")
     parser.add_argument("-r", "--apply-tptrw", action="store_true", help="apply top pt reweighting")
     parser.add_argument("-p", "--from-parquet", action="store_true", help="use parquet files")
     parser.add_argument("--prep-parquet", action="store_true", help="data prep to parquet")
@@ -267,22 +289,31 @@ def main():
             log.info("dont prepping parquet")
             exit(0)
 
-    outdir = pathlib.PosixPath(args.output_dir)
-    outdir.mkdir(exist_ok=True)
-    os.chdir(outdir)
+    plotdir = pathlib.PosixPath(args.output_dir)
+    plotdir.mkdir(exist_ok=True)
+    os.chdir(plotdir)
 
     if "1j1b" in args.regions:
         for entry in META["regions"]["r1j1b"]:
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
-            plot_from_region_frames(dfs_1j1b, entry["var"], binning, "1j1b", entry["log"])
+            fig, ax, axr = plot_from_region_frames(
+                dfs_1j1b, entry["var"], binning, "1j1b", entry["log"]
+            )
+            save_and_close(fig, "r{}_{}.pdf".format("1j1b", entry["var"]))
     if "2j1b" in args.regions:
         for entry in META["regions"]["r2j1b"]:
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
-            plot_from_region_frames(dfs_2j1b, entry["var"], binning, "2j1b", entry["log"])
+            fig, ax, axr = plot_from_region_frames(
+                dfs_2j1b, entry["var"], binning, "2j1b", entry["log"]
+            )
+            save_and_close(fig, "r{}_{}.pdf".format("2j1b", entry["var"]))
     if "2j2b" in args.regions:
         for entry in META["regions"]["r2j2b"]:
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
-            plot_from_region_frames(dfs_2j2b, entry["var"], binning, "2j2b", entry["log"])
+            fig, ax, axr = plot_from_region_frames(
+                dfs_2j2b, entry["var"], binning, "2j2b", entry["log"]
+            )
+            save_and_close(fig, "r{}_{}.pdf".format("2j2b", entry["var"]))
 
     os.chdir(curdir)
 
