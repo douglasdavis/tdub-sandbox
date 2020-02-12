@@ -34,7 +34,7 @@ setup_logging()
 log = logging.getLogger("plot.py")
 
 
-META_FILE = open("meta.yaml", "r")
+META_FILE = open("meta.yml", "r")
 ALL_SAMPLES = ["tW_DR", "ttbar", "Zjets", "Diboson", "MCNP", "Data"]
 LUMI = 139.0
 META = yaml.load(META_FILE, Loader=yaml.Loader)
