@@ -6,7 +6,8 @@ job.out.*
 scan_output_*
 fold_*
 
-vis/data/*.parquet
+vis/data
+vis/pdfs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
