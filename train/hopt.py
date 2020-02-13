@@ -41,6 +41,7 @@ def get_args():
     scan_p.add_argument("-n", "--nlo-method", type=str, choices=["DR", "DS"], default="DR", help="NLO method")
     scan_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
     scan_p.add_argument("-s", "--script-name", type=str, default="condor.hopt.REGION.sub", help="output script name")
+    scan_p.add_argument("-e", "--extra-selection", type=str, help="apply extra selection before training")
     single_p = action_sp.add_parser("single", help="single training round")
     single_p.add_argument("-d", "--data-dir", type=str, help="directory containing data files", required=True)
     single_p.add_argument("-r", "--region", type=str, help="analysis region", required=True)
@@ -100,12 +101,15 @@ def check(args):
 
 def single(args):
     qf = quick_files(args.data_dir)
+    extra_sel = args.extra_selection
+    if extra_sel == "":
+        extra_sel = None
     df, y, w = prepare_from_root(
         qf[f"tW_{args.nlo_method}"],
         qf["ttbar"],
         args.region,
         weight_mean=1.0,
-        extra_selection=args.extra_selection,
+        extra_selection=extra_sel,
     )
     drop_cols(df, *get_avoids(args.region))
     params = dict(
@@ -161,6 +165,9 @@ def scan(args):
     pname = str(p)
     runs = []
     i = 0
+    extra_sel = args.extra_selection
+    if extra_sel is None:
+        extra_sel = ""
     for max_depth in pd.get("max_depth"):
         for num_leaves in pd.get("num_leaves"):
             for n_estimators in pd.get("n_estimators"):
@@ -178,6 +185,7 @@ def scan(args):
                             "-o {}/res{:04d}_{} "
                             "-r {} "
                             "-n {} "
+                            '-e "{}" '
                             "--learning-rate {} "
                             "--num-leaves {} "
                             "--n-estimators {} "
@@ -190,6 +198,7 @@ def scan(args):
                             suffix,
                             args.region,
                             args.nlo_method,
+                            extra_sel,
                             learning_rate,
                             num_leaves,
                             n_estimators,
