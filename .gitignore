@@ -4,9 +4,9 @@
 job.err.*
 job.out.*
 
-train/scan_output_*
-train/fold_*
-train/so_*
+train/**/scan_output_*
+train/**/fold_*
+train/**/so_*
 
 vis/data
 vis/pdfs
