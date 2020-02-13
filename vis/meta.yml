@@ -297,4 +297,4 @@ regions:
     - { var: met, nbins: 40, xmin: 0, xmax: 200, log: false }
     - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 120, xmax: 520, log: false }
     - { var: HT_lep1lep2jet1jet2met, nbins: 40, xmin: 200, xmax: 800, log: false }
-    - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.2, xmax: 0.8, log: false}
+    - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.2, xmax: 0.8, log: false }
