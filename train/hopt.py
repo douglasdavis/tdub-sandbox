@@ -46,6 +46,7 @@ def get_args():
     single_p.add_argument("-r", "--region", type=str, help="analysis region", required=True)
     single_p.add_argument("-n", "--nlo-method", type=str, choices=["DR", "DS"], default="DR", help="NLO method")
     single_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
+    single_p.add_argument("-e", "--extra-selection", type=str, help="apply extra selection before training")
     single_p.add_argument("--learning-rate", type=float, required=True)
     single_p.add_argument("--num-leaves", type=int, required=True)
     single_p.add_argument("--min-child-samples", type=int, required=True)
@@ -100,7 +101,11 @@ def check(args):
 def single(args):
     qf = quick_files(args.data_dir)
     df, y, w = prepare_from_root(
-        qf[f"tW_{args.nlo_method}"], qf["ttbar"], args.region, weight_mean=1.0,
+        qf[f"tW_{args.nlo_method}"],
+        qf["ttbar"],
+        args.region,
+        weight_mean=1.0,
+        extra_selection=args.extra_selection,
     )
     drop_cols(df, *get_avoids(args.region))
     params = dict(
@@ -142,11 +147,7 @@ def fold(args):
         {"verbose": 20, "early_stopping_rounds": args.esr},
         args.out_dir,
         summary["region"],
-        kfold_kw={
-            "n_splits": args.n_splits,
-            "shuffle": True,
-            "random_state": args.seed,
-        },
+        kfold_kw={"n_splits": args.n_splits, "shuffle": True, "random_state": args.seed},
     )
     return 0
 
