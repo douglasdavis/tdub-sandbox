@@ -3,8 +3,10 @@
 *.condor
 job.err.*
 job.out.*
-scan_output_*
-fold_*
+
+train/scan_output_*
+train/fold_*
+train/so_*
 
 vis/data
 vis/pdfs
