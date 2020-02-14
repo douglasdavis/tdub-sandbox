@@ -41,13 +41,13 @@ def get_args():
     scan_p.add_argument("-n", "--nlo-method", type=str, choices=["DR", "DS"], default="DR", help="NLO method")
     scan_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
     scan_p.add_argument("-s", "--script-name", type=str, default="condor.hopt.REGION.sub", help="output script name")
-    scan_p.add_argument("-e", "--extra-selection", type=str, help="apply extra selection before training")
+    scan_p.add_argument("-e", "--extra-selection", type=str, help="input file listing extra selections before training")
     single_p = action_sp.add_parser("single", help="single training round")
     single_p.add_argument("-d", "--data-dir", type=str, help="directory containing data files", required=True)
     single_p.add_argument("-r", "--region", type=str, help="analysis region", required=True)
     single_p.add_argument("-n", "--nlo-method", type=str, choices=["DR", "DS"], default="DR", help="NLO method")
     single_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
-    single_p.add_argument("-e", "--extra-selection", type=str, help="apply extra selection before training")
+    single_p.add_argument("-e", "--extra-selection", type=str, help="input file listing extra selections before training")
     single_p.add_argument("--learning-rate", type=float, required=True)
     single_p.add_argument("--num-leaves", type=int, required=True)
     single_p.add_argument("--min-child-samples", type=int, required=True)
@@ -64,7 +64,6 @@ def get_args():
     fold_p.add_argument("-o", "--out-dir", type=str, help="directory to save output")
     fold_p.add_argument("--seed", type=int, default=414, help="random seed for folding")
     fold_p.add_argument("--n-splits", type=int, default=3, help="number of splits for folding")
-    fold_p.add_argument("--early-stopping-rounds", dest="esr", type=int, help="early stopping rounds")
 
     # fmt: on
     return (parser.parse_args(), parser)
@@ -102,8 +101,8 @@ def check(args):
 def single(args):
     qf = quick_files(args.data_dir)
     extra_sel = args.extra_selection
-    if extra_sel == "":
-        extra_sel = None
+    if extra_sel:
+        extra_sel = PosixPath(extra_sel).read_text().strip()
     df, y, w = prepare_from_root(
         qf[f"tW_{args.nlo_method}"],
         qf["ttbar"],
@@ -148,7 +147,7 @@ def fold(args):
         y,
         w,
         summary["all_params"],
-        {"verbose": 20, "early_stopping_rounds": args.esr},
+        {"verbose": 10},
         args.out_dir,
         summary["region"],
         kfold_kw={"n_splits": args.n_splits, "shuffle": True, "random_state": args.seed},
@@ -167,7 +166,9 @@ def scan(args):
     i = 0
     extra_sel = args.extra_selection
     if extra_sel is None:
-        extra_sel = ""
+        extra_sel = "_NONE"
+    else:
+        extra_sel = str(PosixPath(extra_sel).resolve())
     for max_depth in pd.get("max_depth"):
         for num_leaves in pd.get("num_leaves"):
             for n_estimators in pd.get("n_estimators"):
@@ -185,7 +186,7 @@ def scan(args):
                             "-o {}/res{:04d}_{} "
                             "-r {} "
                             "-n {} "
-                            '-e "{}" '
+                            "-e {} "
                             "--learning-rate {} "
                             "--num-leaves {} "
                             "--n-estimators {} "
@@ -205,6 +206,7 @@ def scan(args):
                             min_child_samples,
                             max_depth,
                         )
+                        arglist = arglist.replace("-e _NONE ", "")
                         runs.append(arglist)
                         i += 1
     output_script_name = args.script_name.replace("REGION", args.region)
