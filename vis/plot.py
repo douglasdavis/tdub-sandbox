@@ -144,7 +144,7 @@ def tune_axes(
         ax.set_ylim([0, ax.get_ylim()[1] * linscale])
 
 
-def plot_from_region_frames(frames, variable, binning, region_label, logy=False) -> None:
+def plot_from_region_frames(frames, variable, binning, region_label, logy=False):
     """create a histogram plot pdf from dataframes and a desired variable
 
     Parameters
@@ -161,6 +161,9 @@ def plot_from_region_frames(frames, variable, binning, region_label, logy=False)
         if true set the yscale to log
 
     """
+    if variable not in frames["Data"].columns.to_list():
+        log.warn("%s not in dataframe; skipping")
+        return None, None, None
     nbins, start, stop = binning
     bin_edges = np.linspace(start, stop, nbins + 1)
     counts = {}
@@ -299,21 +302,24 @@ def main():
             fig, ax, axr = plot_from_region_frames(
                 dfs_1j1b, entry["var"], binning, "1j1b", entry["log"]
             )
-            save_and_close(fig, "r{}_{}.pdf".format("1j1b", entry["var"]))
+            if fig is not None:
+                save_and_close(fig, "r{}_{}.pdf".format("1j1b", entry["var"]))
     if "2j1b" in args.regions:
         for entry in META["regions"]["r2j1b"]:
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
             fig, ax, axr = plot_from_region_frames(
                 dfs_2j1b, entry["var"], binning, "2j1b", entry["log"]
             )
-            save_and_close(fig, "r{}_{}.pdf".format("2j1b", entry["var"]))
+            if fig is not None:
+                save_and_close(fig, "r{}_{}.pdf".format("2j1b", entry["var"]))
     if "2j2b" in args.regions:
         for entry in META["regions"]["r2j2b"]:
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
             fig, ax, axr = plot_from_region_frames(
                 dfs_2j2b, entry["var"], binning, "2j2b", entry["log"]
             )
-            save_and_close(fig, "r{}_{}.pdf".format("2j2b", entry["var"]))
+            if fig is not None:
+                save_and_close(fig, "r{}_{}.pdf".format("2j2b", entry["var"]))
 
     os.chdir(curdir)
 

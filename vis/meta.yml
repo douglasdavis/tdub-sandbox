@@ -263,6 +263,10 @@ titles:
     mpl: "minimax($m_{b\\ell}$)"
     rex: ""
     unit: "GeV"
+  bdtres01:
+    mpl: "BDT Response"
+    rex: ""
+    unit: ""
 
 
 regions:
@@ -276,6 +280,7 @@ regions:
     - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 100, xmax: 540, log: false }
     - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.15, xmax: 0.85, log: false }
     - { var: pTHTratio_lep1lep2jet1met, nbins: 40, xmin: 0.0, xmax: 0.5, log: false }
+    - { var: bdtres01, nbins: 12, xmin: 0.18, xmax: 0.78, log: false }
   r2j1b:
     - { var: pT_lep1, nbins: 40, xmin: 27.0, xmax: 227.0, log: false }
     - { var: pT_lep2, nbins: 40, xmin: 20.0, xmax: 160.0, log: false }
