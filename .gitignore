@@ -1,5 +1,6 @@
 .DS_Store
 *.sub
+*.submit
 *.condor
 job.err.*
 job.out.*
@@ -7,9 +8,11 @@ job.out.*
 train/**/scan_output_*
 train/**/fold_*
 train/**/so_*
+train/**/*.npy
 
 vis/data
 vis/pdfs
+vis/**/*.pdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
