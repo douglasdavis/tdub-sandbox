@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-from __future__ import annotations
-
 # stdlib
 from pprint import pprint
+import argparse
 import sys
 
 # ext
@@ -15,8 +14,8 @@ from tdub.frames import iterative_selection
 from tdub.utils import quick_files
 
 
-def main(sample: str = "tW_DR"):
-    qf = quick_files("/Users/ddavis/ATLAS/data/wtloop/v29_20191030_augmented")
+def main(datadir: str, sample: str = "tW_DR"):
+    qf = quick_files(datadir)
 
     files_PP8 = qf[f"{sample}_AFII"]
     files_PH7 = qf[f"{sample}_PS"]
@@ -65,7 +64,8 @@ def main(sample: str = "tW_DR"):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("ttbar or tW?")
-    else:
-        main(sys.argv[1])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--data-dir", type=str, help="directory with data", required=True)
+    parser.add_argument("-s", "--sample", type=str, choices=["ttbar", "tW_DR"], help="sample name", required=True)
+    args = parser.parse_args()
+    main(args.data_dir, args.sample)
