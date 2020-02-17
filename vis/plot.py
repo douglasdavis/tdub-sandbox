@@ -162,7 +162,7 @@ def plot_from_region_frames(frames, variable, binning, region_label, logy=False)
 
     """
     if variable not in frames["Data"].columns.to_list():
-        log.warn("%s not in dataframe; skipping")
+        log.warning("%s not in dataframe; skipping" % variable)
         return None, None, None
     nbins, start, stop = binning
     bin_edges = np.linspace(start, stop, nbins + 1)
