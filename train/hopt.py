@@ -14,6 +14,7 @@ from tdub.train import (
     SingleTrainingResult,
 )
 from tdub.utils import quick_files, get_avoids, get_features, augment_features
+import tdub.constants
 
 DESCRIPTION = ""
 EXECUTABLE = str(PosixPath(__file__).resolve())
@@ -75,27 +76,57 @@ def check(args):
     for resdir in top_dir.iterdir():
         if resdir.name == "logs" or not resdir.is_dir():
             continue
-        with open(resdir / "summary.json", "r") as f:
+        summary_file = resdir / "summary.json"
+        if not summary_file.exists():
+            continue
+        with summary_file.open("r") as f:
             summary = json.load(f)
-            if summary["bad_ks"] > 0:
+            if summary["bad_ks"]:
                 continue
-            res = SingleTrainingResult(auc=summary["auc"])
+            res = SingleTrainingResult(**summary)
             res.directory = resdir.name
             res.summary = summary
             results.append(res)
-    results = sorted(results, key=lambda r: -r.auc)
-    results[0].summary["dir"] = results[0].directory
-    with open(top_dir / "summary.json", "w") as f:
-        json.dump(results[0].summary, f, indent=4)
 
-    nresults = len(results)
-    if args.prnt:
-        if args.n_res > nresults:
-            for r in results:
-                print(r.directory, r.auc)
-        else:
-            for r in results[: args.n_res]:
-                print(r.directory, r.auc)
+    auc_sr = sorted(results, key=lambda r: -r.auc)
+    ks_pvalue_sr = sorted(results, key=lambda r: -r.ks_pvalue_sig)
+    max_auc_rounded = str(round(auc_sr[0].auc, 2))
+
+    potentials = []
+    for res in ks_pvalue_sr:
+        curauc = str(round(res.auc, 2))
+        if curauc == max_auc_rounded and res.ks_pvalue_bkg > 0.95:
+            potentials.append(res)
+        if len(potentials) > 15:
+            break
+
+    best_res = potentials[0]
+    print(best_res)
+    print(best_res.summary)
+    print(best_res.directory)
+
+    for result in potentials:
+        print(result)
+
+    with open(top_dir / "summary.json", "w") as f:
+        json.dump(potentials[0].summary, f, indent=4)
+
+    # if args.prnt:
+    #     for r in ks_sorted_results:
+    #         print(r.directory, r)
+
+    # nresults = len(auc_sorted_results)
+    # if args.prnt:
+    #     if args.n_res > nresults:
+    #         for r in auc_sorted_results:
+    #             print(r.directory, r)
+    #     else:
+    #         for r in auc_sorted_results[: args.n_res]:
+    #             print(r.directory, r)
+
+    # auc_sorted_results[0].summary["dir"] = auc_sorted_results[0].directory
+    # with open(top_dir / "summary.json", "w") as f:
+    #     json.dump(auc_sorted_results[0].summary, f, indent=4)
 
 
 def single(args):
@@ -136,10 +167,10 @@ def fold(args):
         summary = json.load(f)
     nlo_method = summary["nlo_method"]
     region = summary["region"]
-
+    branches = summary["features"]
     qf = quick_files(args.data_dir)
     df, y, w = prepare_from_root(
-        qf[f"tW_{nlo_method}"], qf["ttbar"], region, weight_mean=1.0,
+        qf[f"tW_{nlo_method}"], qf["ttbar"], region, branches=branches, weight_mean=1.0,
     )
     drop_cols(df, *get_avoids(region))
     folded_training(
@@ -218,7 +249,10 @@ def scan(args):
 
 
 def main():
-    augment_features("2j1b", ["deltaR_lep1lep2_jet1jet2", "deltapT_lep1_jet1"])
+    tdub.constants.AVOID_IN_CLF_1j1b = []
+    tdub.constants.AVOID_IN_CLF_2j1b = []
+    tdub.constants.AVOID_IN_CLF_2j2b = []
+    # augment_features("2j1b", ["deltaR_lep1lep2_jet1jet2", "deltapT_lep1_jet1"])
 
     args, parser = get_args()
 
