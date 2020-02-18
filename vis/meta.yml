@@ -97,159 +97,159 @@ titles:
     unit: ""
   deltaR_lep1lep2_jet1jet2:
     mpl: "$\\Delta R (\\ell_1\\ell_2, j_1j_2)$"
-    rex: ""
+    rex: "#Delta R(lep1lep2, jet1jet2)"
     unit: ""
   deltaR_lep1lep2_jet1jet2met:
     mpl: "$\\Delta R (\\ell_1\\ell_2, j_1j_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#Delta R(lep1lep2, jet1jet2#it{E}_{T}^{miss})"
     unit: ""
   deltaR_lep2_jet1:
     mpl: "$\\Delta R (\\ell_2, j_1)$"
-    rex: ""
+    rex: "#Delta R(lep2, jet1)"
     unit: ""
   deltapT_jet2_met:
     mpl: "$\\Delta p_{\\mathrm{T}} (j_2, E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#Delta#it{p}_{T}(jet2, #it{E}_{T}^{miss})"
     unit: "GeV"
   deltapT_lep1_jet1:
     mpl: "$\\Delta p_{\\mathrm{T}} (\\ell_1, j_1)$"
-    rex: ""
+    rex: "#Delta#it{p}_{T}(lep1, jet1)"
     unit: "GeV"
   deltapT_lep1_lep2:
     mpl: "$\\Delta p_{\\mathrm{T}} (\\ell_1, \\ell_2)$"
-    rex: ""
+    rex: "#Delta#it{p}_{T}(lep1, lep2)"
     unit: "GeV"
   deltapT_lep1lep2_jet1met:
     mpl: "$\\Delta p_{\\mathrm{T}} (\\ell_1\\ell_2, j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#Delta#it{p}_{T}(lep1lep2, jet1#it{E}_{T}^{miss})"
     unit: "GeV"
   deltapT_lep1lep2jet1_met:
     mpl: "$\\Delta p_{\\mathrm{T}} (\\ell_1\\ell_2j_1, E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#Delta#it{p}_{T}(lep1lep2jet1, #it{E}_{T}^{miss})"
     unit: "GeV"
   eom_lep1lep2:
     mpl: "$\\frac{E}{m}(\\ell_1\\ell_2)$"
-    rex: ""
+    rex: "#it{E}/it{m}(lep1lep2)"
     unit: ""
   mT_jet1met:
     mpl: "$m_{\\mathrm{T}}(j_1 E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{m}_{T}(jet1#it{E}_{T}^{miss})"
     unit: "GeV"
   mT_jet2met:
     mpl: "$m_{\\mathrm{T}}(j_2 E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{m}_{T}(jet2#it{E}_{T}^{miss})"
     unit: "GeV"
   mT_lep2met:
     mpl: "$m_{\\mathrm{T}}(\\ell_2 E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{m}_{T}(lep2#it{E}_{T}^{miss})"
     unit: "GeV"
   mass_lep1jet1:
     mpl: "$m(\\ell_1j_1)$"
-    rex: ""
+    rex: "#it{m}(lep1jet1)"
     unit: "GeV"
   mass_lep1jet1jet2:
     mpl: "$m(\\ell_1j_1j_2)$"
-    rex: ""
+    rex: "#it{m}(lep1jet1jet2)"
     unit: "GeV"
   mass_lep1jet2:
     mpl: "$m(\\ell_1j_2)$"
-    rex: ""
+    rex: "#it{m}(lep1jet2)"
     unit: "GeV"
   mass_lep1lep2jet1jet2:
     mpl: "$m(\\ell_1\\ell_2j_1j_2)$"
-    rex: ""
+    rex: "#it{m}(lep1lep2jet1jet2)"
     unit: "GeV"
   mass_lep2jet1:
     mpl: "$m(\\ell_2j_1)$"
-    rex: ""
+    rex: "#it{m}(lep2jet1)"
     unit: "GeV"
   mass_lep2jet1jet2:
     mpl: "$m(\\ell_2j_1j_2)$"
-    rex: ""
+    rex: "#it{m}(lep2jet1jet2)"
     unit: "GeV"
   mass_lep2jet1met:
     mpl: "$m(\\ell_2j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{m}(lep2jet1#it{E}_{T}^{miss})"
     unit: "GeV"
   mass_lep2jet2:
     mpl: "$m(\\ell_2j_2)$"
-    rex: ""
+    rex: "#it{m}(lep2jet2)"
     unit: "GeV"
   pTsys_jet1jet2:
     mpl: "$p_{\\mathrm{T}}^{\\mathrm{sys}} (j_1j_2)$"
-    rex: ""
+    rex: "#it{p}_{T}^{sys}(jet1jet2)"
     unit: "GeV"
   pTsys_jet1met:
     mpl: "$p_{\\mathrm{T}}^{\\mathrm{sys}} (j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{p}_{T}^{sys}(jet1#it{E}_{T}^{miss})"
     unit: "GeV"
   pTsys_lep1lep2:
     mpl: "$p_{\\mathrm{T}}^{\\mathrm{sys}} (\\ell_1\\ell_2)$"
-    rex: ""
+    rex: "#it{p}_{T}^{sys}(lep1lep2)"
     unit: "GeV"
   pTsys_lep1lep2jet1:
     mpl: "$p_{\\mathrm{T}}^{\\mathrm{sys}} (\\ell_1\\ell_2j_1)$"
-    rex: ""
+    rex: "#it{p}_{T}^{sys}(lep1lep2jet1)"
     unit: "GeV"
   pTsys_lep1lep2jet1jet2met:
     mpl: "$p_{\\mathrm{T}}^{\\mathrm{sys}} (\\ell_1\\ell_2j_1j_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{p}_{T}^{sys}(lep1lep2jet1jet2#it{E}_{T}^{miss})"
     unit: "GeV"
   pTsys_lep1lep2jet1met:
     mpl: "$p_{\\mathrm{T}}^{\\mathrm{sys}} (\\ell_1\\ell_2j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{p}_{T}^{sys}(lep1lep2jet1#it{E}_{T}^{miss})"
     unit: "GeV"
   pTsys_lep1lep2met:
     mpl: "$p_{\\mathrm{T}}^{\\mathrm{sys}} (\\ell_1\\ell_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{p}_{T}^{sys}(lep1lep2#it{E}_{T}^{miss})"
     unit: "GeV"
   pTHTratio_lep1lep2jet1met:
     mpl: "$\\frac{p_{\\mathrm{T}}}{H_{\\mathrm{T}}}(\\ell_1\\ell_2j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{p}_{T}/#it{H}_{T}(lep1lep2jet1#it{E}_{T}^{miss})"
     unit: ""
   pTHTratio_lep1lep2jet1jet2met:
     mpl: "$\\frac{p_{\\mathrm{T}}}{H_{\\mathrm{T}}}(\\ell_1\\ell_2j_1j_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#it{p}_{T}/#it{H}_{T}(lep1lep2jet1jet2#it{E}_{T}^{miss})"
     unit: ""
   phi_lep1:
     mpl: "$\\phi(\\ell_1)$"
-    rex: ""
+    rex: "#phi(lep1)"
     unit: ""
   phi_lep2:
     mpl: "$\\phi(\\ell_2)$"
-    rex: ""
+    rex: "#phi(lep2)"
     unit: ""
   phi_jet1:
     mpl: "$\\phi(j_1)$"
-    rex: ""
+    rex: "#phi(jet1)"
     unit: ""
   phi_jet2:
     mpl: "$\\phi(j_2)$"
-    rex: ""
+    rex: "#phi(jet2)"
     unit: ""
   E_lep1:
     mpl: "$E(\\ell_1)$"
-    rex: ""
+    rex: "#it{E}(lep1)"
     unit: "GeV"
   E_lep2:
     mpl: "$E(\\ell_2)$"
-    rex: ""
+    rex: "#it{E}(lep2)"
     unit: "GeV"
   E_jet1:
     mpl: "$E(j_1)$"
-    rex: ""
+    rex: "#it{E}(jet1)"
     unit: "GeV"
   E_jet2:
     mpl: "$E(j_2)$"
-    rex: ""
+    rex: "#it{E}(jet2)"
     unit: "GeV"
   phi_met:
     mpl: "$\\phi(E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: ""
+    rex: "#phi(#it{E}_{T}^{miss})"
     unit: ""
   sumet:
     mpl: "$\\sum E_{\\mathrm{T}}$"
-    rex: ""
+    rex: "#sum#it{E}_{T}"
     unit: "GeV"
   nsoftjets:
     mpl: "$N$ soft jets"
@@ -261,11 +261,11 @@ titles:
     unit: ""
   minimaxmbl:
     mpl: "minimax($m_{b\\ell}$)"
-    rex: ""
+    rex: "minimax(#it{m}_{#it{bl}})"
     unit: "GeV"
   bdtres01:
     mpl: "BDT Response"
-    rex: ""
+    rex: "BDT Response"
     unit: ""
 
 
