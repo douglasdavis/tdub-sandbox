@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from pathlib import PosixPath
 from pprint import pprint
+import logging
 import json
 
 from tdub import setup_logging
@@ -15,6 +16,11 @@ from tdub.train import (
 )
 from tdub.utils import quick_files, get_avoids, get_features, augment_features
 import tdub.constants
+
+
+setup_logging()
+log = logging.getLogger("hopt.py")
+
 
 DESCRIPTION = ""
 EXECUTABLE = str(PosixPath(__file__).resolve())
@@ -240,6 +246,7 @@ def scan(args):
                         arglist = arglist.replace("-e _NONE ", "")
                         runs.append(arglist)
                         i += 1
+    log.info(f"prepared {len(runs)} jobs for submission")
     output_script_name = args.script_name.replace("REGION", args.region)
     output_script = PosixPath(output_script_name)
     with output_script.open("w") as f:
@@ -270,5 +277,4 @@ def main():
 
 
 if __name__ == "__main__":
-    setup_logging()
     main()
