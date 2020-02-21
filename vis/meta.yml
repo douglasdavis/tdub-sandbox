@@ -267,28 +267,67 @@ titles:
     mpl: "BDT Response"
     rex: "BDT Response"
     unit: ""
+  bdtres02:
+    mpl: "BDT Response"
+    rex: "BDT Response"
+    unit: ""
 
 
 regions:
+  r1j1b:
+    - { var: bdtres02, nbins: 12, xmin: 0.18, xmax: 0.78, log: false }
+    - { var: nsoftjets, nbins: 4, xmin: -0.5, xmax: 3.5, log: true }
+    - { var: nsoftbjets, nbins: 3, xmin: -0.5, xmax: 2.5, log: true }
+    - { var: cent_lep1lep2, nbins: 30, xmin: 0.2, xmax: 1, log: false }
+    - { var: deltapT_lep1_jet1, nbins: 30, xmin: -125, xmax: 150, log: false }
+    - { var: deltaR_lep1_lep2, nbins: 30, xmin: 0.2, xmax: 4.5, log: false }
+    - { var: deltaR_lep2_jet1, nbins: 30, xmin: 0.45, xmax: 4.5, log: false }
+    - { var: mass_lep1jet1, nbins: 30, xmin: 20, xmax: 450, log: false }
+    - { var: mass_lep2jet1, nbins: 30, xmin: 20, xmax: 300, log: false }
+    - { var: mT_lep2met, nbins: 30, xmin: 0, xmax: 200, log: false }
+    - { var: pTsys_lep1lep2, nbins: 30, xmin: 0, xmax: 185, log: false }
+    - { var: pTsys_lep1lep2jet1, nbins: 30, xmin: 0, xmax: 225, log: false }
+    - { var: pTsys_lep1lep2jet1met, nbins: 30, xmin: 0, xmax: 120, log: false }
+
+  r2j1b:
+    - { var: bdtres02, nbins: 12, xmin: 0.15, xmax: 0.85, log: false }
+    - { var: mass_lep1jet1, nbins: 30, xmin: 25, xmax: 575, log: false }
+    - { var: mass_lep1jet2, nbins: 30, xmin: 20, xmax: 375, log: false }
+    - { var: mass_lep2jet1, nbins: 30, xmin: 20, xmax: 375, log: false }
+    - { var: mass_lep2jet2, nbins: 30, xmin: 20, xmax: 325, log: false }
+    - { var: psuedoContTagBin_jet1, nbins: 5, xmin: 0.5, xmax: 5.5, log: false }
+    - { var: psuedoContTagBin_jet2, nbins: 5, xmin: 0.5, xmax: 5.5, log: false }
+    - { var: pT_jet2, nbins: 30, xmin: 25, xmax: 160, log: false }
+    - { var: pTsys_lep1lep2jet1jet2met, nbins: 30, xmin: 0, xmax: 140, log: false }
+
+  r2j2b:
+    - { var: bdtres02, nbins: 12, xmin: 0.15, xmax: 0.9, log: false }
+    - { var: deltaR_lep1_jet1, nbins: 30, xmin: 0.45, xmax: 4.25, log: false }
+    - { var: mass_lep1jet1, nbins: 30, xmin: 20, xmax: 500, log: false }
+    - { var: mass_lep1jet2, nbins: 30, xmin: 20, xmax: 325, log: false }
+    - { var: mass_lep2jet1, nbins: 30, xmin: 20, xmax: 325, log: false }
+    - { var: mass_lep2jet2, nbins: 30, xmin: 20, xmax: 325, log: false }
+    - { var: pT_jet2, nbins: 30, xmin: 25, xmax: 175, log: false }
+    - { var: pTsys_lep1lep2met, nbins: 30, xmin: 0, xmax: 225, log: false }
+
+###################################
+#################### backups ######
+###################################
+backup_regions:
   r1j1b:
     - { var: pT_lep1, nbins: 40, xmin: 27.0, xmax: 227.0, log: false }
     - { var: pT_lep2, nbins: 40, xmin: 20.0, xmax: 160.0, log: false }
     - { var: pT_jet1, nbins: 40, xmin: 25.0, xmax: 225.0, log: false }
     - { var: met, nbins: 40, xmin: 0, xmax: 200, log: false }
-    - { var: nsoftjets, nbins: 4, xmin: -0.5, xmax: 3.5, log: true }
-    - { var: nsoftbjets, nbins: 3, xmin: -0.5, xmax: 2.5, log: true }
     - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 100, xmax: 540, log: false }
     - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.15, xmax: 0.85, log: false }
     - { var: pTHTratio_lep1lep2jet1met, nbins: 40, xmin: 0.0, xmax: 0.5, log: false }
-    - { var: bdtres01, nbins: 12, xmin: 0.18, xmax: 0.78, log: false }
   r2j1b:
     - { var: pT_lep1, nbins: 40, xmin: 27.0, xmax: 227.0, log: false }
     - { var: pT_lep2, nbins: 40, xmin: 20.0, xmax: 160.0, log: false }
     - { var: pT_jet1, nbins: 40, xmin: 25.0, xmax: 225.0, log: false }
     - { var: pT_jet2, nbins: 40, xmin: 25.0, xmax: 175.0, log: false }
     - { var: met, nbins: 40, xmin: 0, xmax: 200, log: false }
-    # - { var: nsoftjets, nbins: 4, xmin: -0.5, xmax: 3.5, log: true }
-    # - { var: nsoftbjets, nbins: 3, xmin: -0.5, xmax: 2.5, log: true }
     - { var: HT_lep1lep2jet1met, nbins: 40, xmin: 120, xmax: 580, log: false }
     - { var: HT_lep1lep2jet1jet2met, nbins: 40, xmin: 160, xmax: 780, log: false }
     - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 40, xmin: 0.15, xmax: 0.8, log: false}
