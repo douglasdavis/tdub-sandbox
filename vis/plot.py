@@ -144,7 +144,13 @@ def tune_axes(
         ax.set_ylim([0, ax.get_ylim()[1] * linscale])
 
 
-def plot_from_region_frames(frames, variable, binning, region_label, logy=False):
+def plot_from_region_frames(
+    frames: Dict[str, pd.DataFrame],
+    variable: str,
+    binning: Tuple[int, float, float],
+    region_label: str,
+    logy: bool = False,
+) -> Tuple[plt.Figure, plt.Axes, plt.Axes]:
     """create a histogram plot pdf from dataframes and a desired variable
 
     Parameters
