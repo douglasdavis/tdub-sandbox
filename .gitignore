@@ -10,6 +10,8 @@ train/**/fold_*
 train/**/so_*
 train/**/*.npy
 
+hist/*.root
+
 vis/data
 vis/pdfs
 vis/**/*.pdf
