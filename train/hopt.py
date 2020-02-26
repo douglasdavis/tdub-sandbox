@@ -2,7 +2,6 @@
 
 from argparse import ArgumentParser
 from pathlib import PosixPath
-from pprint import pprint
 import logging
 import json
 
@@ -14,7 +13,7 @@ from tdub.train import (
     folded_training,
     SingleTrainingResult,
 )
-from tdub.utils import quick_files, get_avoids, get_features, augment_features
+from tdub.utils import quick_files, get_avoids
 import tdub.constants
 
 
@@ -49,12 +48,14 @@ def get_args():
     scan_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
     scan_p.add_argument("-s", "--script-name", type=str, default="condor.hopt.REGION.sub", help="output script name")
     scan_p.add_argument("-e", "--extra-selection", type=str, help="input file listing extra selections before training")
+    scan_p.add_argument("-t", "--use-tptrw", action="store_true", help="use top pt reweighting")
     single_p = action_sp.add_parser("single", help="single training round")
     single_p.add_argument("-d", "--data-dir", type=str, help="directory containing data files", required=True)
     single_p.add_argument("-r", "--region", type=str, help="analysis region", required=True)
     single_p.add_argument("-n", "--nlo-method", type=str, choices=["DR", "DS"], default="DR", help="NLO method")
     single_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
     single_p.add_argument("-e", "--extra-selection", type=str, help="input file listing extra selections before training")
+    single_p.add_argument("-t", "--use-tptrw", action="store_true", help="use top pt reweighting")
     single_p.add_argument("--learning-rate", type=float, required=True)
     single_p.add_argument("--num-leaves", type=int, required=True)
     single_p.add_argument("--min-child-samples", type=int, required=True)
@@ -62,15 +63,16 @@ def get_args():
     single_p.add_argument("--n-estimators", type=int, required=True)
     single_p.add_argument("--early-stopping-rounds", type=int, help="early stopping rounds")
     check_p = action_sp.add_parser("check", help="check results")
-    check_p.add_argument("indir", type=str, help="directory containing results")
+    check_p.add_argument("-d", "--direc", type=str, help="directory containing results")
     check_p.add_argument("-p", "--print", action="store_true", dest="prnt", help="print results")
     check_p.add_argument("-n", "--n-res", type=int, default=-1, help="number of top results to print")
     fold_p = action_sp.add_parser("fold", help="folded training")
     fold_p.add_argument("-s", "--scan-dir", type=str, help="scan step's output directory")
     fold_p.add_argument("-d", "--data-dir", type=str, help="directory containing data files", required=True)
     fold_p.add_argument("-o", "--out-dir", type=str, help="directory to save output")
-    fold_p.add_argument("--seed", type=int, default=414, help="random seed for folding")
-    fold_p.add_argument("--n-splits", type=int, default=3, help="number of splits for folding")
+    fold_p.add_argument("-t", "--use-tptrw", action="store_true", help="use top pt reweighting")
+    fold_p.add_argument("-r", "--random-seed", type=int, default=414, help="random seed for folding")
+    fold_p.add_argument("-n", "--n-splits", type=int, default=3, help="number of splits for folding")
 
     # fmt: on
     return (parser.parse_args(), parser)
@@ -78,7 +80,7 @@ def get_args():
 
 def check(args):
     results = []
-    top_dir = PosixPath(args.indir)
+    top_dir = PosixPath(args.direc)
     for resdir in top_dir.iterdir():
         if resdir.name == "logs" or not resdir.is_dir():
             continue
@@ -146,6 +148,7 @@ def single(args):
         args.region,
         weight_mean=1.0,
         extra_selection=extra_sel,
+        use_tptrw=args.use_tptrw,
     )
     drop_cols(df, *get_avoids(args.region))
     params = dict(
@@ -176,7 +179,12 @@ def fold(args):
     branches = summary["features"]
     qf = quick_files(args.data_dir)
     df, y, w = prepare_from_root(
-        qf[f"tW_{nlo_method}"], qf["ttbar"], region, branches=branches, weight_mean=1.0,
+        qf[f"tW_{nlo_method}"],
+        qf["ttbar"],
+        region,
+        branches=branches,
+        weight_mean=1.0,
+        use_tptrw=args.use_tptrw,
     )
     drop_cols(df, *get_avoids(region))
     folded_training(
@@ -187,7 +195,11 @@ def fold(args):
         {"verbose": 10},
         args.out_dir,
         summary["region"],
-        kfold_kw={"n_splits": args.n_splits, "shuffle": True, "random_state": args.seed},
+        kfold_kw={
+            "n_splits": args.n_splits,
+            "shuffle": True,
+            "random_state": args.random_seed,
+        },
     )
     return 0
 
@@ -219,6 +231,7 @@ def scan(args):
                             max_depth,
                         )
                         arglist = (
+                            "{}"
                             "-d {} "
                             "-o {}/res{:04d}_{} "
                             "-r {} "
@@ -230,6 +243,7 @@ def scan(args):
                             "--min-child-samples {} "
                             "--max-depth {} "
                         ).format(
+                            "-a " if args.use_tptrw else "",
                             args.data_dir,
                             pname,
                             i,
