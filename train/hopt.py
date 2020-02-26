@@ -47,21 +47,22 @@ def get_args():
     scan_p.add_argument("-n", "--nlo-method", type=str, choices=["DR", "DS"], default="DR", help="NLO method")
     scan_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
     scan_p.add_argument("-s", "--script-name", type=str, default="condor.hopt.REGION.sub", help="output script name")
-    scan_p.add_argument("-e", "--extra-selection", type=str, help="input file listing extra selections before training")
+    scan_p.add_argument("-x", "--extra-selection", type=str, help="input file listing extra selections before training")
     scan_p.add_argument("-t", "--use-tptrw", action="store_true", help="use top pt reweighting")
+    scan_p.add_argument("-e", "--early-stopping-rounds", type=int, help="classifier early stopping rounds")
     single_p = action_sp.add_parser("single", help="single training round")
     single_p.add_argument("-d", "--data-dir", type=str, help="directory containing data files", required=True)
     single_p.add_argument("-r", "--region", type=str, help="analysis region", required=True)
     single_p.add_argument("-n", "--nlo-method", type=str, choices=["DR", "DS"], default="DR", help="NLO method")
     single_p.add_argument("-o", "--out-dir", type=str, help="output directory", required=True)
-    single_p.add_argument("-e", "--extra-selection", type=str, help="input file listing extra selections before training")
+    single_p.add_argument("-x", "--extra-selection", type=str, help="input file listing extra selections before training")
     single_p.add_argument("-t", "--use-tptrw", action="store_true", help="use top pt reweighting")
+    single_p.add_argument("--early-stopping-rounds", type=int, help="early stopping rounds")
     single_p.add_argument("--learning-rate", type=float, required=True)
     single_p.add_argument("--num-leaves", type=int, required=True)
     single_p.add_argument("--min-child-samples", type=int, required=True)
     single_p.add_argument("--max-depth", type=int, required=True)
     single_p.add_argument("--n-estimators", type=int, required=True)
-    single_p.add_argument("--early-stopping-rounds", type=int, help="early stopping rounds")
     check_p = action_sp.add_parser("check", help="check results")
     check_p.add_argument("-d", "--direc", type=str, help="directory containing results")
     check_p.add_argument("-p", "--print", action="store_true", dest="prnt", help="print results")
@@ -69,7 +70,7 @@ def get_args():
     fold_p = action_sp.add_parser("fold", help="folded training")
     fold_p.add_argument("-s", "--scan-dir", type=str, help="scan step's output directory")
     fold_p.add_argument("-d", "--data-dir", type=str, help="directory containing data files", required=True)
-    fold_p.add_argument("-o", "--out-dir", type=str, help="directory to save output")
+    fold_p.add_argument("-o", "--out-dir", type=str, help="directory to save output", required=True)
     fold_p.add_argument("-t", "--use-tptrw", action="store_true", help="use top pt reweighting")
     fold_p.add_argument("-r", "--random-seed", type=int, default=414, help="random seed for folding")
     fold_p.add_argument("-n", "--n-splits", type=int, default=3, help="number of splits for folding")
@@ -175,6 +176,9 @@ def fold(args):
     with open(f"{args.scan_dir}/summary.json", "r") as f:
         summary = json.load(f)
     nlo_method = summary["nlo_method"]
+    best_iteration = summary["best_iteration"]
+    if best_iteration > 0:
+        summary["all_params"]["n_estimators"] = best_iteration
     region = summary["region"]
     branches = summary["features"]
     qf = quick_files(args.data_dir)
@@ -236,14 +240,15 @@ def scan(args):
                             "-o {}/res{:04d}_{} "
                             "-r {} "
                             "-n {} "
-                            "-e {} "
+                            "-x {} "
                             "--learning-rate {} "
                             "--num-leaves {} "
                             "--n-estimators {} "
                             "--min-child-samples {} "
                             "--max-depth {} "
+                            "--early-stopping-rounds {} "
                         ).format(
-                            "-a " if args.use_tptrw else "",
+                            "-t " if args.use_tptrw else "",
                             args.data_dir,
                             pname,
                             i,
@@ -256,8 +261,9 @@ def scan(args):
                             n_estimators,
                             min_child_samples,
                             max_depth,
+                            args.early_stopping_rounds
                         )
-                        arglist = arglist.replace("-e _NONE ", "")
+                        arglist = arglist.replace("-x _NONE ", "")
                         runs.append(arglist)
                         i += 1
     log.info(f"prepared {len(runs)} jobs for submission")
