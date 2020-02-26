@@ -17,6 +17,7 @@ import pygram11 as pg
 import yaml
 
 ## tdub
+from tdub.constants import FEATURESET_1j1b, FEATURESET_2j1b, FEATURESET_2j2b
 from tdub.art import setup_style, canvas_from_counts
 from tdub.utils import (
     quick_files,
@@ -25,7 +26,7 @@ from tdub.utils import (
     get_selection,
     bin_centers,
 )
-from tdub.frames import raw_dataframe
+from tdub.frames import raw_dataframe, apply_weight_tptrw
 from tdub import setup_logging
 
 setup_style()
@@ -100,6 +101,7 @@ def save_and_close(fig: plt.Figure, name: str) -> None:
     name : str
         the filename to give the saved figure
     """
+    log.info("saving %s" % name)
     fig.savefig(name)
     plt.close(fig)
 
@@ -150,6 +152,7 @@ def plot_from_region_frames(
     binning: Tuple[int, float, float],
     region_label: str,
     logy: bool = False,
+    legend_kw : Dict[str, Any] = None,
 ) -> Tuple[plt.Figure, plt.Axes, plt.Axes]:
     """create a histogram plot pdf from dataframes and a desired variable
 
@@ -165,6 +168,8 @@ def plot_from_region_frames(
         the region label (will be part of out file name)
     logy : bool
         if true set the yscale to log
+    legend_kw : dict(str, Any)
+        keyward arguments passed to :py:func:`matplotlib.Axes.axes.legend`.
 
     """
     if variable not in frames["Data"].columns.to_list():
@@ -187,13 +192,16 @@ def plot_from_region_frames(
     )
     tune_axes(ax, axr, variable, binning, logy=logy)
 
+    if legend_kw is None:
+        legend_kw = {}
+    legend_kw["ncol"] = 2
     ax.legend(loc="upper right")
     handles, labels = ax.get_legend_handles_labels()
     handles.insert(0, handles.pop())
     labels.insert(0, labels.pop())
-    ax.legend(handles, labels, loc="upper right", ncol=1)
+    ax.legend(handles, labels, loc="upper right", **legend_kw)
 
-    fig.subplots_adjust(left=0.115, bottom=0.115, right=0.965, top=0.95)
+    fig.subplots_adjust(left=0.125, bottom=0.095, right=0.965, top=0.95)
     return fig, ax, axr
 
 
@@ -261,6 +269,7 @@ def parse_args():
     parser.add_argument("-p", "--from-parquet", action="store_true", help="use parquet files")
     parser.add_argument("--prep-parquet", action="store_true", help="data prep to parquet")
     parser.add_argument("--regions", type=str, nargs="+", help="regions to plot", default=["2j2b", "2j1b", "1j1b"])
+    parser.add_argument("--skip-absent-features", action="store_true", help="skip if var not in feature list")
     # fmt: on
     return parser.parse_args()
 
@@ -298,12 +307,21 @@ def main():
             log.info("dont prepping parquet")
             exit(0)
 
+    if args.apply_tptrw:
+        log.info("applying top pt reweighting")
+        apply_weight_tptrw(dfs_1j1b["ttbar"])
+        apply_weight_tptrw(dfs_2j1b["ttbar"])
+        apply_weight_tptrw(dfs_2j2b["ttbar"])
+
     plotdir = pathlib.PosixPath(args.output_dir)
     plotdir.mkdir(exist_ok=True)
     os.chdir(plotdir)
 
     if "1j1b" in args.regions:
         for entry in META["regions"]["r1j1b"]:
+            if args.skip_absent_features:
+                if entry["var"] not in FEATURESET_1j1b:
+                    continue
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
             fig, ax, axr = plot_from_region_frames(
                 dfs_1j1b, entry["var"], binning, "1j1b", entry["log"]
@@ -312,6 +330,9 @@ def main():
                 save_and_close(fig, "r{}_{}.pdf".format("1j1b", entry["var"]))
     if "2j1b" in args.regions:
         for entry in META["regions"]["r2j1b"]:
+            if args.skip_absent_features:
+                if entry["var"] not in FEATURESET_2j1b:
+                    continue
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
             fig, ax, axr = plot_from_region_frames(
                 dfs_2j1b, entry["var"], binning, "2j1b", entry["log"]
@@ -320,6 +341,9 @@ def main():
                 save_and_close(fig, "r{}_{}.pdf".format("2j1b", entry["var"]))
     if "2j2b" in args.regions:
         for entry in META["regions"]["r2j2b"]:
+            if args.skip_absent_features:
+                if entry["var"] not in FEATURESET_2j2b:
+                    continue
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
             fig, ax, axr = plot_from_region_frames(
                 dfs_2j2b, entry["var"], binning, "2j2b", entry["log"]
