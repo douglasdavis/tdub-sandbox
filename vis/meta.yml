@@ -61,11 +61,11 @@ titles:
     unit: "GeV"
   HTratio_lep1lep2_lep1lep2jet1met:
     mpl: "$\\left. H_{\\mathrm{T}}(\\ell_1\\ell_2) \\right/ H_{\\mathrm{T}}(\\ell_1\\ell_2j_1E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: "#it{H}_{T}(lep1, lep2) / #it{H}_{T}(lep1, lep2, jet1, #{E}_{T}^{miss})"
+    rex: "#it{H}_{T}(lep1, lep2) / #it{H}_{T}(lep1, lep2, jet1, #it{E}_{T}^{miss})"
     unit: ""
   HTratio_lep1lep2_lep1lep2jet1jet2met:
     mpl: "$\\left. H_{\\mathrm{T}}(\\ell_1\\ell_2) \\right/ H_{\\mathrm{T}}(\\ell_1\\ell_2j_1j_2E_{\\mathrm{T}}^{\\mathrm{miss}})$"
-    rex: "#it{H}_{T}(lep1lep2) / #it{H}_{T}(lep1lep2jet1jet2#{E}_{T}^{miss})"
+    rex: "#it{H}_{T}(lep1lep2) / #it{H}_{T}(lep1lep2jet1jet2#it{E}_{T}^{miss})"
     unit: ""
   cent_lep1lep2:
     mpl: "Centrality($\\ell_1\\ell_2$)"
