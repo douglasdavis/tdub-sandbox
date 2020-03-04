@@ -260,7 +260,7 @@ def region_frames_from_qf(
 
 
 
-@click.command()
+@click.command(context_settings=dict(max_content_width=92))
 @click.option("-d", "--data-dir", type=str, default="/Users/ddavis/ATLAS/data/wtloop/v29_20200201", help="data directory")
 @click.option("-o", "--output-dir", type=str, default="pdfs", help="directory to store output")
 @click.option("--apply-tptrw", is_flag=True, help="apply top pt reweighting")
