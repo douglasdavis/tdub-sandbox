@@ -251,7 +251,6 @@ def fold(scan_dir, data_dir, out_dir, use_tptrw, random_seed, n_splits):
         weight_mean=1.0,
         use_tptrw=use_tptrw,
     )
-    drop_cols(df, *get_avoids(region))
     folded_training(
         df,
         y,
