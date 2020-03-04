@@ -181,7 +181,7 @@ def check(directory, print_top, n_res):
     """Check the results of a parameter scan."""
     from tdub.train import SingleTrainingResult
     results = []
-    top_dir = PosixPath(direc)
+    top_dir = PosixPath(directory)
     for resdir in top_dir.iterdir():
         if resdir.name == "logs" or not resdir.is_dir():
             continue
