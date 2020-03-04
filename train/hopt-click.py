@@ -168,7 +168,7 @@ def scan(config, data_dir, region, out_dir, nlo_method, script_name, extra_selec
     with output_script.open("w") as f:
         print(BNL_CONDOR_HEADER.format(exe=EXECUTABLE, out_dir=pname), file=f)
         for run in runs:
-            print(f"Arguments = single {run}\nQueue\n\n", file=f)
+            print(f"Arguments = train-single {run}\nQueue\n\n", file=f)
 
     return 0
 
