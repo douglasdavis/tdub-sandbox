@@ -268,6 +268,51 @@ def fold(scan_dir, data_dir, out_dir, use_tptrw, random_seed, n_splits):
     return 0
 
 
+@cli.command("apply-gen-npy", context_settings=dict(max_content_width=92))
+@click.option("--bnl", type=str, help="all files in a BNL data directory")
+@click.option("--single", type=str, help="a single ROOT file")
+@click.option("-f", "--folds", type=str, multiple=True, help="fold output directories")
+@click.option("-n", "--arr-name", type=str, help="array name")
+@click.option("-o", "--out-dir", type=str, help="save output to directory")
+@click.option("--bnl-script-name", type=str, help="BNL condor submit script name")
+def apply_gen_npy(bnl, single, folds, arr_name, out_dir, bnl_script_name):
+    """Generate BDT response array(s) and save to .npy file"""
+    if single is not None and bnl is not None:
+        raise ValueError("can only choose --bnl or --single, not both")
+
+    from tdub.batch import gen_apply_npy_script
+    from tdub.apply import generate_npy, FoldedResult
+    from tdub.utils import SampleInfo
+    from tdub.frames import raw_dataframe
+
+    if out_dir is not None:
+        outdir = PosixPath(out_dir)
+
+    if bnl is not None:
+        gen_apply_npy_script(EXECUTABLE, bnl, folds, outdir, arr_name, bnl_script_name)
+        return 0
+
+    frs = [FoldedResult(p) for p in folds]
+    necessary_branches = ["OS", "elmu", "reg2j1b", "reg2j2b", "reg1j1b"]
+    for fold in frs:
+        necessary_branches += fold.features
+    necessary_branches = sorted(set(necessary_branches), key=str.lower)
+
+    log.info("Loading necessary branches:")
+    for nb in necessary_branches:
+        log.info(f" - {nb}")
+
+    def process_sample(sample_name):
+        stem = PosixPath(sample_name).stem
+        sampinfo = SampleInfo(stem)
+        tree = f"WtLoop_{sampinfo.tree}"
+        df = raw_dataframe(sample_name, tree=tree, branches=necessary_branches)
+        npyfilename = outdir / f"{stem}.{arr_name}.npy"
+        generate_npy(frs, df, npyfilename)
+
+    if single is not None:
+        process_sample(single)
+
 
 if __name__ == "__main__":
     import tdub.constants
