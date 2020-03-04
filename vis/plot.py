@@ -3,9 +3,7 @@
 ## stdlib
 import os
 import pathlib
-import argparse
 import logging
-
 from typing import Dict, Tuple, List, Optional, Any
 
 ## pip
@@ -15,6 +13,7 @@ import numpy as np
 import pandas as pd
 import pygram11 as pg
 import yaml
+import click
 
 ## tdub
 from tdub.constants import FEATURESET_1j1b, FEATURESET_2j1b, FEATURESET_2j2b
@@ -259,29 +258,22 @@ def region_frames_from_qf(
 ###############################################################################
 
 
-def parse_args():
-    # fmt: off
-    parser = argparse.ArgumentParser(description="make some plots")
-    parser.add_argument("-d", "--data-dir", type=str,
-                        default="/Users/ddavis/ATLAS/data/wtloop/v29_20200201", help="data directory")
-    parser.add_argument("-o", "--output-dir", type=str, default="pdfs", help="directory to store output")
-    parser.add_argument("-r", "--apply-tptrw", action="store_true", help="apply top pt reweighting")
-    parser.add_argument("-p", "--from-parquet", action="store_true", help="use parquet files")
-    parser.add_argument("--prep-parquet", action="store_true", help="data prep to parquet")
-    parser.add_argument("--regions", type=str, nargs="+", help="regions to plot", default=["2j2b", "2j1b", "1j1b"])
-    parser.add_argument("--skip-absent-features", action="store_true", help="skip if var not in feature list")
-    # fmt: on
-    return parser.parse_args()
 
 
-def main():
+@click.command()
+@click.option("-d", "--data-dir", type=str, default="/Users/ddavis/ATLAS/data/wtloop/v29_20200201", help="data directory")
+@click.option("-o", "--output-dir", type=str, default="pdfs", help="directory to store output")
+@click.option("--apply-tptrw", is_flag=True, help="apply top pt reweighting")
+@click.option("--from-parquet", is_flag=True, help="use parquet files")
+@click.option("--prep-parquet", is_flag=True, help="data prep to parquet")
+@click.option("--regions", type=str, multiple=True, help="regions to plot", default=["2j2b", "2j1b", "1j1b"])
+@click.option("--skip-absent-features", is_flag=True, help="skip if var not in feature list")
+def plot(data_dir, output_dir, apply_tptrw, from_parquet, prep_parquet, regions, skip_absent_features):
     curdir = pathlib.PosixPath(__file__).parent.resolve()
     datadir = curdir / "data"
     datadir.mkdir(exist_ok=True)
 
-    args = parse_args()
-
-    if args.from_parquet:
+    if from_parquet:
         log.info("reading parquet files")
         dfs_1j1b, dfs_2j1b, dfs_2j2b = {}, {}, {}
         for samp in ALL_SAMPLES:
@@ -291,9 +283,9 @@ def main():
         log.info("done reading parquet files")
 
     else:
-        qf = quick_files(args.data_dir)
+        qf = quick_files(data_dir)
         dfs_1j1b, dfs_2j1b, dfs_2j2b = region_frames_from_qf(qf)
-        if args.prep_parquet:
+        if prep_parquet:
             log.info("preping parquet files")
             for k, v in dfs_1j1b.items():
                 name = datadir / f"{k}_1j1b.parquet"
@@ -307,19 +299,19 @@ def main():
             log.info("dont prepping parquet")
             exit(0)
 
-    if args.apply_tptrw:
+    if apply_tptrw:
         log.info("applying top pt reweighting")
         apply_weight_tptrw(dfs_1j1b["ttbar"])
         apply_weight_tptrw(dfs_2j1b["ttbar"])
         apply_weight_tptrw(dfs_2j2b["ttbar"])
 
-    plotdir = pathlib.PosixPath(args.output_dir)
+    plotdir = pathlib.PosixPath(output_dir)
     plotdir.mkdir(exist_ok=True)
     os.chdir(plotdir)
 
-    if "1j1b" in args.regions:
+    if "1j1b" in regions:
         for entry in META["regions"]["r1j1b"]:
-            if args.skip_absent_features:
+            if skip_absent_features:
                 if entry["var"] not in FEATURESET_1j1b:
                     continue
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
@@ -328,9 +320,9 @@ def main():
             )
             if fig is not None:
                 save_and_close(fig, "r{}_{}.pdf".format("1j1b", entry["var"]))
-    if "2j1b" in args.regions:
+    if "2j1b" in regions:
         for entry in META["regions"]["r2j1b"]:
-            if args.skip_absent_features:
+            if skip_absent_features:
                 if entry["var"] not in FEATURESET_2j1b:
                     continue
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
@@ -339,9 +331,9 @@ def main():
             )
             if fig is not None:
                 save_and_close(fig, "r{}_{}.pdf".format("2j1b", entry["var"]))
-    if "2j2b" in args.regions:
+    if "2j2b" in regions:
         for entry in META["regions"]["r2j2b"]:
-            if args.skip_absent_features:
+            if skip_absent_features:
                 if entry["var"] not in FEATURESET_2j2b:
                     continue
             binning = (entry["nbins"], entry["xmin"], entry["xmax"])
@@ -355,4 +347,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    plot()
