@@ -293,31 +293,31 @@ regions:
 
   r2j1b:
     - { var: pT_lep1, nbins: 20, xmin: 27.0, xmax: 227.0, log: false }
-    - { var: pT_lep2, nbins: 20, xmin: 20.0, xmax: 160.0, log: false }
+    - { var: pT_lep2, nbins: 20, xmin: 20.0, xmax: 140.0, log: false }
     - { var: pT_jet1, nbins: 20, xmin: 25.0, xmax: 225.0, log: false }
-    - { var: pT_jet2, nbins: 20, xmin: 25.0, xmax: 175.0, log: false }
+    - { var: pT_jet2, nbins: 20, xmin: 25.0, xmax: 145.0, log: false }
     - { var: met, nbins: 20, xmin: 0, xmax: 200, log: false }
     # bdt vars
     - { var: pTsys_lep1lep2, nbins: 20, xmin: 0, xmax: 180, log: false }
-    - { var: pTsys_lep1lep2jet1met, nbins: 20, xmin: 0, xmax: 120, log: false }
+    - { var: pTsys_lep1lep2jet1met, nbins: 20, xmin: 0, xmax: 150, log: false }
     - { var: pTsys_lep1lep2jet1jet2met, nbins: 20, xmin: 0, xmax: 140, log: false }
     - { var: mass_lep1jet1, nbins: 20, xmin: 25, xmax: 575, log: false }
     - { var: mass_lep1jet2, nbins: 20, xmin: 20, xmax: 375, log: false }
     - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 20, xmin: 0.15, xmax: 0.8, log: false}
-    - { var: HTratio_lep1lep2_lep1lep2jet1jet2met, nbins: 20, xmin: 0.15, xmax: 0.8, log: false}
+    - { var: HTratio_lep1lep2_lep1lep2jet1jet2met, nbins: 20, xmin: 0.15, xmax: 0.7, log: false}
     - { var: deltaR_lep2_jet1, nbins: 20, xmin: 0.45, xmax: 4.25, log: false }
 
   r2j2b:
     - { var: pT_lep1, nbins: 20, xmin: 27.0, xmax: 227.0, log: false }
-    - { var: pT_lep2, nbins: 20, xmin: 20.0, xmax: 160.0, log: false }
+    - { var: pT_lep2, nbins: 20, xmin: 20.0, xmax: 140.0, log: false }
     - { var: pT_jet1, nbins: 20, xmin: 25.0, xmax: 225.0, log: false }
     - { var: met, nbins: 20, xmin: 0, xmax: 200, log: false }
     # bdt vars
     - { var: pT_jet2, nbins: 20, xmin: 25.0, xmax: 175.0, log: false }
     - { var: mass_lep1jet1, nbins: 20, xmin: 20, xmax: 500, log: false }
-    - { var: mass_lep1jet2, nbins: 20, xmin: 20, xmax: 325, log: false }
-    - { var: mass_lep2jet1, nbins: 20, xmin: 20, xmax: 325, log: false }
-    - { var: mass_lep2jet2, nbins: 20, xmin: 20, xmax: 325, log: false }
+    - { var: mass_lep1jet2, nbins: 20, xmin: 20, xmax: 300, log: false }
+    - { var: mass_lep2jet1, nbins: 20, xmin: 20, xmax: 300, log: false }
+    - { var: mass_lep2jet2, nbins: 20, xmin: 20, xmax: 300, log: false }
     - { var: pTsys_jet1jet2, nbins: 20, xmin: 0, xmax: 225, log: false }
     - { var: pTsys_lep1lep2met, nbins: 20, xmin: 0, xmax: 225, log: false }
 
@@ -342,8 +342,6 @@ backup_regions:
     - { var: mass_lep2jet2, nbins: 20, xmin: 20, xmax: 325, log: false }
     - { var: HT_lep1lep2jet1met, nbins: 20, xmin: 120, xmax: 580, log: false }
     - { var: HT_lep1lep2jet1jet2met, nbins: 20, xmin: 160, xmax: 780, log: false }
-    - { var: HTratio_lep1lep2_lep1lep2jet1met, nbins: 20, xmin: 0.15, xmax: 0.8, log: false}
-    - { var: HTratio_lep1lep2_lep1lep2jet1jet2met, nbins: 20, xmin: 0.15, xmax: 0.8, log: false}
     - { var: pTHTratio_lep1lep2jet1met, nbins: 20, xmin: 0.0, xmax: 0.5, log: false }
     - { var: pTHTratio_lep1lep2jet1jet2met, nbins: 20, xmin: 0.0, xmax: 0.5, log: false }
     - { var: psuedoContTagBin_jet1, nbins: 5, xmin: 0.5, xmax: 5.5, log: false }
