@@ -75,7 +75,7 @@ def single(data_dir, region, out_dir, nlo_method, extra_selection, use_tptrw, ea
         n_estimators=n_estimators,
     )
     extra_sum = {"region": region, "nlo_method": nlo_method}
-    sr = single_training(
+    single_training(
         df,
         y,
         w,
@@ -233,7 +233,6 @@ def check(directory, print_top, n_res):
 def fold(scan_dir, data_dir, out_dir, use_tptrw, random_seed, n_splits):
     """Perform a folded training based on a hyperparameter scan result"""
     from tdub.train import folded_training, prepare_from_root
-    from tdub.frames import drop_cols
     with open(f"{scan_dir}/summary.json", "r") as f:
         summary = json.load(f)
     nlo_method = summary["nlo_method"]
@@ -312,6 +311,48 @@ def apply_gen_npy(bnl, single, folds, arr_name, out_dir, bnl_script_name):
 
     if single is not None:
         process_sample(single)
+
+
+@cli.command("soverb", context_settings=dict(max_content_width=92))
+@click.argument("data-dir", type=str)
+@click.argument("selections", type=str)
+def soverb(data_dir, selections):
+    """Check the signal over background given a selection JSON file.
+
+    the format of the JSON entries should be "region": "selection".
+
+    Example:
+
+    \b
+      {
+          "reg1j1b" : "(mass_lep1lep2 < 150) & (mass_lep2jet1 < 150)",
+          "reg1j1b" : "(mass_jet1jet2 < 150) & (mass_lep2jet1 < 120)",
+          "reg2j2b" : "(met < 120)"
+      }
+
+    """
+    from tdub.frames import raw_dataframe, apply_weight_tptrw, satisfying_selection
+    from tdub.utils import quick_files, minimal_branches
+
+    with open(selections, "r") as f:
+        selections = json.load(f)
+
+    necessary_branches = set()
+    for selection, query in selections.items():
+        necessary_branches |= minimal_branches(query)
+    necessary_branches = list(necessary_branches) + ["weight_tptrw_tool"]
+
+    qf = quick_files(data_dir)
+    bkg = qf["ttbar"] + qf["Diboson"] + qf["Zjets"] + qf["MCNP"]
+    sig = qf["tW_DR"]
+
+    sig_df = raw_dataframe(sig, branches=necessary_branches)
+    bkg_df = raw_dataframe(bkg, branches=necessary_branches, entrysteps="1GB")
+    apply_weight_tptrw(bkg_df)
+
+    for sel, query in selections.items():
+        s_df, b_df = satisfying_selection(sig_df, bkg_df, selection=query)
+        print(sel, s_df["weight_nominal"].sum() / b_df["weight_nominal"].sum())
 
 
 if __name__ == "__main__":
