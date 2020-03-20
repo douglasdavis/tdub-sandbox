@@ -40,33 +40,37 @@ def cli():
 @click.option("-r", "--region", type=str, required=True, help="the region to train on")
 @click.option("-o", "--out-dir", type=str, required=True, help="output directory name")
 @click.option("-n", "--nlo-method", type=str, default="DR", help="tW simluation NLO method", show_default=True)
-@click.option("-x", "--extra-selection", type=str, help="extra selection file")
+@click.option("-x", "--override-selection", type=str, help="override selection with contents of file")
 @click.option("-t", "--use-tptrw", is_flag=True, help="apply top pt reweighting")
+@click.option("-i", "--ignore-list", type=str, help="variable ignore list file")
 @click.option("-e", "--early-stopping-rounds", type=int, help="number of early stopping rounds")
 @click.option("--learning-rate", type=float, required=True, help="learning_rate model parameter")
 @click.option("--num-leaves", type=int, required=True, help="num_leaves model parameter")
 @click.option("--min-child-samples", type=int, required=True, help="min_child_samples model parameter")
 @click.option("--max-depth", type=int, required=True, help="max_depth model parameter")
 @click.option("--n-estimators", type=int, required=True, help="n_estimators model parameter")
-def single(data_dir, region, out_dir, nlo_method, extra_selection, use_tptrw, early_stopping_rounds,
-           learning_rate, num_leaves, min_child_samples, max_depth, n_estimators):
+def single(data_dir, region, out_dir, nlo_method, override_selection, use_tptrw, ignore_list,
+           early_stopping_rounds, learning_rate, num_leaves, min_child_samples, max_depth, n_estimators):
     """Execute a single training round."""
     from tdub.train import single_training, prepare_from_root
     from tdub.utils import get_avoids
     from tdub.frames import drop_cols
     qf = quick_files(data_dir)
-    extra_sel = extra_selection
-    if extra_sel:
-        extra_sel = PosixPath(extra_sel).read_text().strip()
+    override_sel = override_selection
+    if override_sel:
+        override_sel = PosixPath(override_sel).read_text().strip()
     df, y, w = prepare_from_root(
         qf[f"tW_{nlo_method}"],
         qf["ttbar"],
         region,
         weight_mean=1.0,
-        extra_selection=extra_sel,
+        override_selection=override_sel,
         use_tptrw=use_tptrw,
     )
     drop_cols(df, *get_avoids(region))
+    if ignore_list:
+        drops = PosixPath(ignore_list).read_text().strip().split()
+        drop_cols(df, *drops)
     params = dict(
         learning_rate=learning_rate,
         num_leaves=num_leaves,
@@ -93,10 +97,12 @@ def single(data_dir, region, out_dir, nlo_method, extra_selection, use_tptrw, ea
 @click.option("-o", "--out-dir", type=str, required=True, help="output directory name")
 @click.option("-n", "--nlo-method", type=str, default="DR", help="tW simluation NLO method", show_default=True)
 @click.option("-s", "--script-name", type=str, default="hopt.scan.REGION.sub", help="output script name", show_default=True)
-@click.option("-x", "--extra-selection", type=str, help="extra selection string")
+@click.option("-x", "--override-selection", type=str, help="override selection with contents of file")
 @click.option("-t", "--use-tptrw", is_flag=True, help="apply top pt reweighting")
+@click.option("-i", "--ignore-list", type=str, help="variable ignore list file")
 @click.option("-e", "--early-stopping-rounds", type=int, help="number of early stopping rounds")
-def scan(config, data_dir, region, out_dir, nlo_method, script_name, extra_selection, use_tptrw, early_stopping_rounds):
+def scan(config, data_dir, region, out_dir, nlo_method, script_name, override_selection,
+         use_tptrw, ignore_list, early_stopping_rounds):
     """Generate a condor submission script to execute a hyperparameter scan.
 
     The scan parameters are defined in the CONFIG file, and the data
@@ -113,11 +119,15 @@ def scan(config, data_dir, region, out_dir, nlo_method, script_name, extra_selec
     pname = str(p)
     runs = []
     i = 0
-    extra_sel = extra_selection
-    if extra_sel is None:
-        extra_sel = "_NONE"
+    override_sel = override_selection
+    if override_sel is None:
+        override_sel = "_NONE"
     else:
-        extra_sel = str(PosixPath(extra_sel).resolve())
+        override_sel = str(PosixPath(override_sel).resolve())
+    if ignore_list is None:
+        ignore_list = "_NONE"
+    else:
+        ignore_list = str(PosixPath(ignore_list).resolve())
     for max_depth in pd.get("max_depth"):
         for num_leaves in pd.get("num_leaves"):
             for n_estimators in pd.get("n_estimators"):
@@ -151,7 +161,7 @@ def scan(config, data_dir, region, out_dir, nlo_method, script_name, extra_selec
                             suffix,
                             region,
                             nlo_method,
-                            extra_sel,
+                            override_sel,
                             learning_rate,
                             num_leaves,
                             n_estimators,
@@ -160,6 +170,7 @@ def scan(config, data_dir, region, out_dir, nlo_method, script_name, extra_selec
                             early_stopping_rounds
                         )
                         arglist = arglist.replace("-x _NONE ", "")
+                        arglist = arglist.replace("-i _NONE ", "")
                         runs.append(arglist)
                         i += 1
     log.info(f"prepared {len(runs)} jobs for submission")
@@ -241,11 +252,13 @@ def fold(scan_dir, data_dir, out_dir, use_tptrw, random_seed, n_splits):
         summary["all_params"]["n_estimators"] = best_iteration
     region = summary["region"]
     branches = summary["features"]
+    selection = summary["selection_used"]
     qf = quick_files(data_dir)
     df, y, w = prepare_from_root(
         qf[f"tW_{nlo_method}"],
         qf["ttbar"],
         region,
+        override_selection=selection,
         branches=branches,
         weight_mean=1.0,
         use_tptrw=use_tptrw,
@@ -281,7 +294,7 @@ def apply_gen_npy(bnl, single, folds, arr_name, out_dir, bnl_script_name):
 
     from tdub.batch import gen_apply_npy_script
     from tdub.apply import generate_npy, FoldedResult
-    from tdub.utils import SampleInfo
+    from tdub.utils import SampleInfo, minimal_branches
     from tdub.frames import raw_dataframe
 
     if out_dir is not None:
@@ -295,6 +308,7 @@ def apply_gen_npy(bnl, single, folds, arr_name, out_dir, bnl_script_name):
     necessary_branches = ["OS", "elmu", "reg2j1b", "reg2j2b", "reg1j1b"]
     for fold in frs:
         necessary_branches += fold.features
+        necessary_branches += minimal_branches(fold.selection_used)
     necessary_branches = sorted(set(necessary_branches), key=str.lower)
 
     log.info("Loading necessary branches:")
