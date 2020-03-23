@@ -147,6 +147,7 @@ def scan(config, data_dir, region, out_dir, nlo_method, script_name, override_se
                             "-r {} "
                             "-n {} "
                             "-x {} "
+                            "-i {} "
                             "--learning-rate {} "
                             "--num-leaves {} "
                             "--n-estimators {} "
@@ -162,6 +163,7 @@ def scan(config, data_dir, region, out_dir, nlo_method, script_name, override_se
                             region,
                             nlo_method,
                             override_sel,
+                            ignore_list,
                             learning_rate,
                             num_leaves,
                             n_estimators,
@@ -285,7 +287,7 @@ def fold(scan_dir, data_dir, out_dir, use_tptrw, random_seed, n_splits):
 @click.option("--single", type=str, help="a single ROOT file")
 @click.option("-f", "--folds", type=str, multiple=True, help="fold output directories")
 @click.option("-n", "--arr-name", type=str, help="array name")
-@click.option("-o", "--out-dir", type=str, help="save output to directory")
+@click.option("-o", "--out-dir", type=str, help="save output to directory", required=True)
 @click.option("--bnl-script-name", type=str, help="BNL condor submit script name")
 def apply_gen_npy(bnl, single, folds, arr_name, out_dir, bnl_script_name):
     """Generate BDT response array(s) and save to .npy file"""
@@ -297,11 +299,10 @@ def apply_gen_npy(bnl, single, folds, arr_name, out_dir, bnl_script_name):
     from tdub.utils import SampleInfo, minimal_branches
     from tdub.frames import raw_dataframe
 
-    if out_dir is not None:
-        outdir = PosixPath(out_dir)
+    out_dir = PosixPath(out_dir)
 
     if bnl is not None:
-        gen_apply_npy_script(EXECUTABLE, bnl, folds, outdir, arr_name, bnl_script_name)
+        gen_apply_npy_script(EXECUTABLE, bnl, folds, out_dir, arr_name, bnl_script_name)
         return 0
 
     frs = [FoldedResult(p) for p in folds]
@@ -320,7 +321,7 @@ def apply_gen_npy(bnl, single, folds, arr_name, out_dir, bnl_script_name):
         sampinfo = SampleInfo(stem)
         tree = f"WtLoop_{sampinfo.tree}"
         df = raw_dataframe(sample_name, tree=tree, branches=necessary_branches)
-        npyfilename = outdir / f"{stem}.{arr_name}.npy"
+        npyfilename = out_dir / f"{stem}.{arr_name}.npy"
         generate_npy(frs, df, npyfilename)
 
     if single is not None:
