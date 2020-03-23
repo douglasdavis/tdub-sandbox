@@ -1,8 +1,0 @@
-{
-    "reg1j1b": "(reg1j1b == 1) & (OS == 1)",
-    "reg2j1b": "(reg2j1b == 1) & (OS == 1) & (pTsys_lep1lep2 < 120)",
-    "reg2j2b": "(reg2j2b == 1) & (OS == 1) & (met < 120)",
-    "reg1j1braw": "(reg1j1b == 1) & (OS == 1)",
-    "reg2j1braw": "(reg2j1b == 1) & (OS == 1)",
-    "reg2j2braw": "(reg2j2b == 1) & (OS == 1)"
-}
