@@ -29,13 +29,11 @@ def main(datadir: str, sample: str = "tW_DR"):
         files_PP8,
         "(OS == True)",
         branches=["OS", "reg1j1b", "reg2j1b", "reg2j2b"],
-        concat=True,
     )
     df_PH7 = iterative_selection(
         files_PH7,
         "(OS == True)",
         branches=["OS", "reg1j1b", "reg2j1b", "reg2j2b"],
-        concat=True,
     )
     PP8_raw_sum = df_PP8.weight_nominal.sum()
     PH7_raw_sum = df_PH7.weight_nominal.sum()
