@@ -283,7 +283,7 @@ regions:
     - { var: cent_lep1lep2, nbins: 20, xmin: 0.2, xmax: 1, log: false }
     - { var: deltapT_lep1_lep2, nbins: 20, xmin: 0, xmax: 140, log: false }
     - { var: mass_lep2jet1met, nbins: 20, xmin: 50, xmax: 500, log: false }
-    - { var: mass_lep2jet1, nbins: 20, xmin: 20, xmax: 300, log: false }
+    - { var: mass_lep2jet1, nbins: 20, xmin: 20, xmax: 250, log: false }
     - { var: mass_lep1jet1, nbins: 20, xmin: 20, xmax: 425, log: false }
     - { var: mT_jet1met, nbins: 20, xmin:  0, xmax: 350, log: false }
     - { var: pT_jetS1, nbins: 25, xmin: 0, xmax: 25, log: false }
