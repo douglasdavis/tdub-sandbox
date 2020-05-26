@@ -275,6 +275,18 @@ titles:
     mpl: "BDT Response"
     rex: "BDT Response"
     unit: ""
+  reg1j1b:
+    mpl: "BDT Response"
+    rex: "BDT Response"
+    unit: ""
+  reg2j1b:
+    mpl: "BDT Response"
+    rex: "BDT Response"
+    unit: ""
+  reg2j2b:
+    mpl: "BDT Response"
+    rex: "BDT Response"
+    unit: ""
 
 
 regions:
