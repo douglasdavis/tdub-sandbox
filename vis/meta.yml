@@ -39,6 +39,10 @@ titles:
     mpl: "$E_{\\mathrm{T}}^{\\mathrm{miss}}$"
     rex: "#it{E}_{T}^{miss}"
     unit: "GeV"
+  genericMT2:
+    mpl: "$M_{\\mathrm{T}2}$"
+    rex: "M_{T2}"
+    unit: "GeV"
   psuedoContTagBin_jet1:
     mpl: "$b$-tag bin ($j_1$)"
     rex: "b-tag bin (jet1)"
@@ -279,6 +283,7 @@ regions:
     - { var: pT_lep2, nbins: 20, xmin: 20.0, xmax: 140.0, log: false }
     - { var: pT_jet1, nbins: 20, xmin: 25.0, xmax: 225.0, log: false }
     - { var: met, nbins: 20, xmin: 0, xmax: 200, log: false }
+    - { var: genericMT2, nbins: 20, xmin: 0, xmax: 100, log: true }
     # bdt vars
     - { var: cent_lep1lep2, nbins: 20, xmin: 0.2, xmax: 1, log: false }
     - { var: deltapT_lep1_lep2, nbins: 20, xmin: 0, xmax: 140, log: false }
@@ -300,6 +305,7 @@ regions:
     - { var: minimaxmbl, nbins: 20, xmin: 40, xmax: 290, log: false }
     - { var: mass_lep2jet1, nbins: 20, xmin: 20, xmax: 320, log: false }
     - { var: mass_lep2jet2, nbins: 20, xmin: 20, xmax: 300, log: false }
+    - { var: genericMT2, nbins: 20, xmin: 0, xmax: 100, log: true }
     # bdt vars
     - { var: pTsys_lep1lep2, nbins: 20, xmin: 0, xmax: 180, log: false }
     - { var: pTsys_lep1lep2jet1met, nbins: 20, xmin: 0, xmax: 150, log: false }
@@ -316,6 +322,7 @@ regions:
     - { var: pT_jet1, nbins: 20, xmin: 25.0, xmax: 225.0, log: false }
     - { var: met, nbins: 20, xmin: 0, xmax: 200, log: false }
     - { var: minimaxmbl, nbins: 20, xmin: 40, xmax: 290, log: false }
+    - { var: genericMT2, nbins: 20, xmin: 0, xmax: 100, log: true }
     # bdt vars
     - { var: pT_jet2, nbins: 20, xmin: 25.0, xmax: 175.0, log: false }
     - { var: mass_lep1jet1, nbins: 20, xmin: 20, xmax: 500, log: false }
