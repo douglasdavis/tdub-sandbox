@@ -11,14 +11,17 @@ import pygram11
 
 # tdub
 from tdub.frames import iterative_selection
-from tdub.utils import quick_files
+from tdub.data import quick_files
 
 
 def main(datadir: str, sample: str = "tW_DR"):
     qf = quick_files(datadir)
 
     files_PP8 = qf[f"{sample}_AFII"]
-    files_PH7 = qf[f"{sample}_PS"]
+    if sample == "ttbar":
+        files_PH7 = qf[f"{sample}_PS713"]
+    else:
+        files_PH7 = qf[f"{sample}_PS"]
 
     print("PP8 files:")
     pprint(files_PP8)
