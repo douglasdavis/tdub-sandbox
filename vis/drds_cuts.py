@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from dataclasses import dataclass
+
 from tdub.frames import raw_dataframe
 from tdub.data import quick_files
 from tdub.art import setup_tdub_style, draw_atlas_label
@@ -13,36 +15,71 @@ import numpy as np
 import click
 
 
+class Comparison:
+    def __init__(self, nominal, up, down, pdiff_up, pdiff_down):
+        self.nominal = nominal
+        self.up = up
+        self.down = down
+        self.pdiff_up = pdiff_up
+        self.pdiff_down = pdiff_down
+
+    @property
+    def pdiff_min(self):
+        return np.amin([self.pdiff_up, self.pdiff_down])
+
+    @property
+    def pdiff_max(self):
+        return np.amax([self.pdiff_up, self.pdiff_down])
+
+    @property
+    def template_max(self):
+        return np.amax([self.up, self.down])
+
+
+
+def onesidedsym_comparison(nominal, up):
+    """Generate components of a systematic comparion plot.
+
+    Paramters
+    ---------
+    nominal : numpy.ndarray
+        Histogram bin counts for the nominal template.
+    up : numpy.ndarray
+        Histogram bin counts for the "up" variation.
+
+    Returns
+    -------
+    Comparison
+        The complete description of the comparison
+    """
+    diffs = nominal - up
+    down = nominal + diffs
+    pdiff_up = (up - nominal) / nominal * 100.0
+    pdiff_down = (down - nominal) / nominal * 100.0
+    return Comparison(nominal, up, down, pdiff_up, pdiff_down)
+
+
 def drds_comparison(dr_counts, ds_counts, edges):
-    differences = dr_counts - ds_counts
-    variation = dr_counts + differences
-    red_perdiff = (ds_counts - dr_counts) / dr_counts * 100.0
-    blu_perdiff = (variation - dr_counts) / dr_counts * 100.0
-    full_sample = np.hstack([ds_counts, variation])
-    main_max = np.max(full_sample) * 1.6
-    full_ratio_sample = np.hstack([red_perdiff, blu_perdiff])
-    ratio_min = np.min(full_ratio_sample) * 1.4
-    ratio_max = np.max(full_ratio_sample) * 1.4
-    fig, (ax, axr) = plt.subplots(
-        2,
-        1,
-        sharex=True,
-        gridspec_kw=dict(height_ratios=[3.25, 1], hspace=0.025),
-    )
+    c = onesidedsym_comparison(dr_counts, ds_counts)
     centers = bin_centers(edges)
-    ax.hist(centers, bins=edges, weights=ds_counts, color="red", histtype="step", label=r"$+1\sigma$ (DS variation)")
-    ax.hist(centers, bins=edges, weights=variation, color="blue", histtype="step", label=r"$-1\sigma$ (DS symmetrised)")
-    ax.hist(centers, bins=edges, weights=dr_counts, color="black", histtype="step", label="Nominal DR")
-    ax.set_ylim([0, main_max])
+    fig, (ax, axr) = plt.subplots(2, 1, sharex=True, gridspec_kw=dict(height_ratios=[3.25, 1], hspace=0.025))
+
+    ax.hist(centers, bins=edges, weights=c.up, color="red", histtype="step", label=r"$+1\sigma$ Variation")
+    ax.hist(centers, bins=edges, weights=c.down, color="blue", histtype="step", label=r"$-1\sigma$ Variation")
+    ax.hist(centers, bins=edges, weights=c.nominal, color="black", histtype="step", label="Nominal Template")
+    ymax = c.template_max * 1.6
+    ax.set_ylim([0, ymax])
     ax.set_ylabel("Number of Events", horizontalalignment="right", y=1.0)
     ax.legend()
-    axr.hist(centers, bins=edges, weights=red_perdiff, color="red", histtype="step")
-    axr.hist(centers, bins=edges, weights=blu_perdiff, color="blue", histtype="step")
-    axr.set_ylim([ratio_min, ratio_max])
+
+    axr.hist(centers, bins=edges, weights=c.pdiff_up, color="red", histtype="step")
+    axr.hist(centers, bins=edges, weights=c.pdiff_down, color="blue", histtype="step")
+    axr.set_ylim([c.pdiff_min * 1.25, c.pdiff_max * 1.25])
     axr.set_xlim([edges[0], edges[-1]])
     axr.plot(edges, np.zeros_like(edges), ls="-", lw=1.5, c="black")
     axr.set_ylabel(r"$\frac{\mathrm{Sys.} - \mathrm{Nom.}}{\mathrm{Sys.}}$ [%]")
     axr.set_xlabel("BDT Response", horizontalalignment="right", x=1.0)
+
     fig.subplots_adjust(left=0.15)
     draw_atlas_label(ax, follow="Simulation Internal")
     return fig, ax, axr
@@ -101,8 +138,11 @@ def bdt_cut_plots(
         xmax=bins_1j1b[2]
     )
     fig, ax, axr = drds_comparison(dr, ds, np.linspace(bins_1j1b[1], bins_1j1b[2], bins_1j1b[0] + 1))
-    ax.fill_betweenx([-1, 1.0e5], -1.0, lo_1j1b, color="gray", alpha=0.5)
-    axr.fill_betweenx([-200, 200], -1.0, lo_1j1b, color="gray", alpha=0.5)
+    ymid = ax.get_ylim()[1] * 0.69
+    xmid = (lo_1j1b - ax.get_xlim()[0]) * 0.5 + ax.get_xlim()[0]
+    ax.text(xmid, ymid, "Excluded", ha="center", va="center", color="gray", size=9)
+    ax.fill_betweenx([-1, 1.0e5], -1.0, lo_1j1b, color="gray", alpha=0.55)
+    axr.fill_betweenx([-200, 200], -1.0, lo_1j1b, color="gray", alpha=0.55)
     fig.savefig("drds_1j1b.pdf")
     plt.close(fig)
 
@@ -118,8 +158,11 @@ def bdt_cut_plots(
         xmax=bins_2j1b[2]
     )
     fig, ax, axr = drds_comparison(dr, ds, np.linspace(bins_2j1b[1], bins_2j1b[2], bins_2j1b[0] + 1))
-    ax.fill_betweenx([-1, 1.0e5], hi_2j1b, 1.0, color="gray", alpha=0.5)
-    axr.fill_betweenx([-200, 200], hi_2j1b, 1.0, color="gray", alpha=0.5)
+    ax.fill_betweenx([-1, 1.0e5], hi_2j1b, 1.0, color="gray", alpha=0.55)
+    axr.fill_betweenx([-200, 200], hi_2j1b, 1.0, color="gray", alpha=0.55)
+    ymid = ax.get_ylim()[1] * 0.69
+    xmid = (ax.get_xlim()[1] - hi_2j1b) * 0.5 + hi_2j1b
+    ax.text(xmid, ymid, "Excluded", ha="center", va="center", color="gray", size=9)
     fig.savefig("drds_2j1b.pdf")
     plt.close(fig)
 
@@ -135,10 +178,15 @@ def bdt_cut_plots(
         xmax=bins_2j2b[2]
     )
     fig, ax, axr = drds_comparison(dr, ds, np.linspace(bins_2j2b[1], bins_2j2b[2], bins_2j2b[0] + 1))
-    ax.fill_betweenx([-1, 1.0e5], -1.0, lo_2j2b, color="gray", alpha=0.5)
-    axr.fill_betweenx([-200, 200], -1.0, lo_2j2b, color="gray", alpha=0.5)
-    ax.fill_betweenx([-1, 1.0e5], hi_2j2b, 1.0, color="gray", alpha=0.5)
-    axr.fill_betweenx([-200, 200], hi_2j2b, 1.0, color="gray", alpha=0.5)
+    ax.fill_betweenx([-1, 1.0e5], -1.0, lo_2j2b, color="gray", alpha=0.55)
+    axr.fill_betweenx([-200, 200], -1.0, lo_2j2b, color="gray", alpha=0.55)
+    ax.fill_betweenx([-1, 1.0e5], hi_2j2b, 1.0, color="gray", alpha=0.55)
+    axr.fill_betweenx([-200, 200], hi_2j2b, 1.0, color="gray", alpha=0.55)
+    ymid = ax.get_ylim()[1] * 0.69
+    xmid = (lo_2j2b - ax.get_xlim()[0]) * 0.5 + ax.get_xlim()[0]
+    ax.text(xmid, ymid, "Excluded", ha="center", va="center", color="gray", size=9)
+    xmid = (ax.get_xlim()[1] - hi_2j2b) * 0.5 + hi_2j2b
+    ax.text(xmid, ymid, "Excluded", ha="center", va="center", color="gray", size=9)
     fig.savefig("drds_2j2b.pdf")
     plt.close(fig)
 
