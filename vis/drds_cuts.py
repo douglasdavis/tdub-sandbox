@@ -56,13 +56,13 @@ def cli():
 @cli.command("bdt-cut-plots", context_settings=dict(max_content_width=92))
 @click.argument("source", type=click.Path(exists=True))
 @click.option("--branch", type=str, default="bdtres03", help="BDT branch")
-@click.option("--lo-1j1b", type=float, default=0.3, help="Low end 1j1b BDT cut")
-@click.option("--hi-2j1b", type=float, default=0.7, help="High end 2j1b BDT cut")
-@click.option("--lo-2j2b", type=float, default=0.4, help="Low end 2j2b BDT cut")
-@click.option("--hi-2j2b", type=float, default=0.7, help="High end 2j2b BDT cut")
-@click.option("--bins-1j1b", type=(int, float, float), default=(20, 0.2, 0.80), help="Binning (n, min, max) of 1j1b bins")
-@click.option("--bins-2j1b", type=(int, float, float), default=(20, 0.2, 0.85), help="Binning (n, min, max) of 2j1b bins")
-@click.option("--bins-2j2b", type=(int, float, float), default=(20, 0.2, 0.90), help="Binning (n, min, max) of 2j2b bins")
+@click.option("--lo-1j1b", type=float, default=0.35, help="Low end 1j1b BDT cut")
+@click.option("--hi-2j1b", type=float, default=0.70, help="High end 2j1b BDT cut")
+@click.option("--lo-2j2b", type=float, default=0.45, help="Low end 2j2b BDT cut")
+@click.option("--hi-2j2b", type=float, default=0.775, help="High end 2j2b BDT cut")
+@click.option("--bins-1j1b", type=(int, float, float), default=(15, 0.2, 0.80), help="Binning (n, min, max) of 1j1b bins")
+@click.option("--bins-2j1b", type=(int, float, float), default=(15, 0.2, 0.85), help="Binning (n, min, max) of 2j1b bins")
+@click.option("--bins-2j2b", type=(int, float, float), default=(15, 0.2, 0.90), help="Binning (n, min, max) of 2j2b bins")
 def bdt_cut_plots(
     source,
     branch,
