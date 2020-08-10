@@ -15,42 +15,43 @@ from tdub.art import draw_impact_barh
 
 starting_dir = PosixPath.cwd()
 
-ws704 = "/Users/ddavis/20200806/h704/rpcc_main_asimov/tW"
-ws713 = "/Users/ddavis/20200806/h713/rpcc_main_asimov/tW"
+ws704 = "/Users/ddavis/Desktop/20200806/h704/rpcc_main_asimov/tW"
+ws713 = "/Users/ddavis/Desktop/20200806/h713/rpcc_main_asimov/tW"
 
-ws704_data = "/Users/ddavis/20200806/h704/rpcc_main_data/tW"
-ws713_data = "/Users/ddavis/20200806/h713/rpcc_main_data/tW"
+ws704_data = "/Users/ddavis/Desktop/20200806/h704/rpcc_main_data/tW"
+ws713_data = "/Users/ddavis/Desktop/20200806/h713/rpcc_main_data/tW"
 
-print(tr.delta_mu(ws704, ws713))
-print(tr.delta_mu(ws704_data, ws713_data))
-
-print(tr.delta_mu(ws704_data, ws713_data, poi_name="mu_ttbar"))
-
-
+print(tr.delta_poi(ws704, ws713))
+print(tr.delta_poi(ws704, ws713, poi="mu_ttbar"))
+print(tr.delta_poi(ws704_data, ws713_data))
+print(tr.delta_poi(ws704_data, ws713_data, poi="mu_ttbar"))
 
 
-nps = sorted([
-    tr.nuispar_impact(ws704, "ttbar_PS_1j1b", "h704 ttbar PS 1j1b"),
-    tr.nuispar_impact(ws713, "ttbar_PS_1j1b", "h713 ttbar PS 1j1b"),
-    tr.nuispar_impact(ws704, "ttbar_PS_2j1b", "h704 ttbar PS 2j1b"),
-    tr.nuispar_impact(ws713, "ttbar_PS_2j1b", "h713 ttbar PS 2j1b"),
-    tr.nuispar_impact(ws704, "ttbar_PS_2j2b", "h704 ttbar PS 2j2b"),
-    tr.nuispar_impact(ws713, "ttbar_PS_2j2b", "h713 ttbar PS 2j2b"),
-    tr.nuispar_impact(ws704, "ttbar_PS_norm", "h704 ttbar PS norm"),
-    tr.nuispar_impact(ws713, "ttbar_PS_norm", "h713 ttbar PS norm"),
-    tr.nuispar_impact(ws704, "ttbar_PS_migration", "h704 ttbar PS migration"),
-    tr.nuispar_impact(ws713, "ttbar_PS_migration", "h713 ttbar PS migration"),
-    tr.nuispar_impact(ws704, "tW_PS_1j1b", "h704 tW PS 1j1b"),
-    tr.nuispar_impact(ws713, "tW_PS_1j1b", "h713 tW PS 1j1b"),
-    tr.nuispar_impact(ws704, "tW_PS_2j1b", "h704 tW PS 2j1b"),
-    tr.nuispar_impact(ws713, "tW_PS_2j1b", "h713 tW PS 2j1b"),
-    tr.nuispar_impact(ws704, "tW_PS_2j2b", "h704 tW PS 2j2b"),
-    tr.nuispar_impact(ws713, "tW_PS_2j2b", "h713 tW PS 2j2b"),
-    tr.nuispar_impact(ws704, "tW_PS_norm", "h704 tW PS norm"),
-    tr.nuispar_impact(ws713, "tW_PS_norm", "h713 tW PS norm"),
-    tr.nuispar_impact(ws704, "tW_PS_migration", "h704 tW PS migration"),
-    tr.nuispar_impact(ws713, "tW_PS_migration", "h713 tW PS migration"),
-], key=lambda n: n.post_max)
+nps = sorted(
+    [
+        tr.nuispar_impact(ws704, "ttbar_PS_1j1b", "h704 ttbar PS 1j1b"),
+        tr.nuispar_impact(ws713, "ttbar_PS_1j1b", "h713 ttbar PS 1j1b"),
+        tr.nuispar_impact(ws704, "ttbar_PS_2j1b", "h704 ttbar PS 2j1b"),
+        tr.nuispar_impact(ws713, "ttbar_PS_2j1b", "h713 ttbar PS 2j1b"),
+        tr.nuispar_impact(ws704, "ttbar_PS_2j2b", "h704 ttbar PS 2j2b"),
+        tr.nuispar_impact(ws713, "ttbar_PS_2j2b", "h713 ttbar PS 2j2b"),
+        tr.nuispar_impact(ws704, "ttbar_PS_norm", "h704 ttbar PS norm"),
+        tr.nuispar_impact(ws713, "ttbar_PS_norm", "h713 ttbar PS norm"),
+        tr.nuispar_impact(ws704, "ttbar_PS_migration", "h704 ttbar PS migration"),
+        tr.nuispar_impact(ws713, "ttbar_PS_migration", "h713 ttbar PS migration"),
+        tr.nuispar_impact(ws704, "tW_PS_1j1b", "h704 tW PS 1j1b"),
+        tr.nuispar_impact(ws713, "tW_PS_1j1b", "h713 tW PS 1j1b"),
+        tr.nuispar_impact(ws704, "tW_PS_2j1b", "h704 tW PS 2j1b"),
+        tr.nuispar_impact(ws713, "tW_PS_2j1b", "h713 tW PS 2j1b"),
+        tr.nuispar_impact(ws704, "tW_PS_2j2b", "h704 tW PS 2j2b"),
+        tr.nuispar_impact(ws713, "tW_PS_2j2b", "h713 tW PS 2j2b"),
+        tr.nuispar_impact(ws704, "tW_PS_norm", "h704 tW PS norm"),
+        tr.nuispar_impact(ws713, "tW_PS_norm", "h713 tW PS norm"),
+        tr.nuispar_impact(ws704, "tW_PS_migration", "h704 tW PS migration"),
+        tr.nuispar_impact(ws713, "tW_PS_migration", "h713 tW PS migration"),
+    ],
+    key=lambda n: n.post_max,
+)
 
 df = tr.nuispar_impact_plot_df(nps)
 ys = np.array(df.ys)
@@ -63,9 +64,23 @@ ax.set_yticklabels([p.label for p in nps])
 ax2.legend(loc="lower left", bbox_to_anchor=(-0.75, -0.09))
 ax2.set_xlabel(r"$\Delta\mu$", labelpad=25)
 ax.set_xlabel(r"$(\hat{\theta}-\theta_0)/\Delta\theta$", labelpad=20)
-ax.text(0.10, 0.95, "ATLAS", fontstyle="italic", fontweight="bold", size=14, transform=ax.transAxes)
+ax.text(
+    0.10,
+    0.95,
+    "ATLAS",
+    fontstyle="italic",
+    fontweight="bold",
+    size=14,
+    transform=ax.transAxes,
+)
 ax.text(0.37, 0.95, "Internal", size=14, transform=ax.transAxes)
-ax.text(0.10, 0.92, "$\\sqrt{s}$ = 13 TeV, $L = {139}$ fb$^{-1}$", size=12, transform=ax.transAxes)
+ax.text(
+    0.10,
+    0.92,
+    "$\\sqrt{s}$ = 13 TeV, $L = {139}$ fb$^{-1}$",
+    size=12,
+    transform=ax.transAxes,
+)
 fig.subplots_adjust(left=0.45, bottom=0.085, top=0.915, right=0.975)
 mpl_dir = PosixPath(".") / "matplotlib"
 mpl_dir.mkdir(exist_ok=True)
@@ -108,9 +123,23 @@ ax.set_yticklabels([p.label for p in nps])
 ax2.legend(loc="lower left", bbox_to_anchor=(-0.75, -0.09))
 ax2.set_xlabel(r"$\Delta\mu$", labelpad=25)
 ax.set_xlabel(r"$(\hat{\theta}-\theta_0)/\Delta\theta$", labelpad=20)
-ax.text(0.10, 0.95, "ATLAS", fontstyle="italic", fontweight="bold", size=14, transform=ax.transAxes)
+ax.text(
+    0.10,
+    0.95,
+    "ATLAS",
+    fontstyle="italic",
+    fontweight="bold",
+    size=14,
+    transform=ax.transAxes,
+)
 ax.text(0.37, 0.95, "Internal", size=14, transform=ax.transAxes)
-ax.text(0.10, 0.92, "$\\sqrt{s}$ = 13 TeV, $L = {139}$ fb$^{-1}$", size=12, transform=ax.transAxes)
+ax.text(
+    0.10,
+    0.92,
+    "$\\sqrt{s}$ = 13 TeV, $L = {139}$ fb$^{-1}$",
+    size=12,
+    transform=ax.transAxes,
+)
 fig.subplots_adjust(left=0.45, bottom=0.085, top=0.915, right=0.975)
 mpl_dir = PosixPath(".") / "matplotlib"
 mpl_dir.mkdir(exist_ok=True)
@@ -120,7 +149,7 @@ del fig, ax, ax2
 
 
 def shotgun_1j1b(poi, h7v):
-    os.chdir(f"/Users/ddavis/20200806/{h7v}")
+    os.chdir(f"/Users/ddavis/Desktop/20200806/{h7v}")
     setups = [
         "asimov",
         "asimov_1j1b",
@@ -134,7 +163,10 @@ def shotgun_1j1b(poi, h7v):
         "data_only17",
         "data_only18",
     ]
-    nps = sorted([tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups], key=lambda n: n.post_max)
+    nps = sorted(
+        [tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups],
+        key=lambda n: n.post_max,
+    )
     os.chdir(starting_dir)
     df = tr.nuispar_impact_plot_df(nps)
     ys = np.array(df.ys)
@@ -147,7 +179,15 @@ def shotgun_1j1b(poi, h7v):
     ax2.legend(loc="lower left", bbox_to_anchor=(-0.75, -0.09))
     ax2.set_xlabel(r"$\Delta\mu$", labelpad=25)
     ax.set_xlabel(r"$(\hat{\theta}-\theta_0)/\Delta\theta$", labelpad=20)
-    ax.text(0.10, 0.95, "ATLAS", fontstyle="italic", fontweight="bold", size=14, transform=ax.transAxes)
+    ax.text(
+        0.10,
+        0.95,
+        "ATLAS",
+        fontstyle="italic",
+        fontweight="bold",
+        size=14,
+        transform=ax.transAxes,
+    )
     ax.text(0.37, 0.95, "Internal", size=14, transform=ax.transAxes)
     ax.text(0.10, 0.92, f"{poi}, {h7v}", size=14, transform=ax.transAxes)
     fig.subplots_adjust(left=0.45, bottom=0.085, top=0.915, right=0.975)
@@ -159,7 +199,7 @@ def shotgun_1j1b(poi, h7v):
 
 
 def shotgun_2j1b(poi, h7v):
-    os.chdir(f"/Users/ddavis/20200806/{h7v}")
+    os.chdir(f"/Users/ddavis/Desktop/20200806/{h7v}")
     setups = [
         "asimov",
         "asimov_2j1b",
@@ -171,7 +211,10 @@ def shotgun_2j1b(poi, h7v):
         "data_only17",
         "data_only18",
     ]
-    nps = sorted([tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups], key=lambda n: n.post_max)
+    nps = sorted(
+        [tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups],
+        key=lambda n: n.post_max,
+    )
     os.chdir(starting_dir)
     df = tr.nuispar_impact_plot_df(nps)
     ys = np.array(df.ys)
@@ -184,7 +227,15 @@ def shotgun_2j1b(poi, h7v):
     ax2.legend(loc="lower left", bbox_to_anchor=(-0.75, -0.09))
     ax2.set_xlabel(r"$\Delta\mu$", labelpad=25)
     ax.set_xlabel(r"$(\hat{\theta}-\theta_0)/\Delta\theta$", labelpad=20)
-    ax.text(0.10, 0.95, "ATLAS", fontstyle="italic", fontweight="bold", size=14, transform=ax.transAxes)
+    ax.text(
+        0.10,
+        0.95,
+        "ATLAS",
+        fontstyle="italic",
+        fontweight="bold",
+        size=14,
+        transform=ax.transAxes,
+    )
     ax.text(0.37, 0.95, "Internal", size=14, transform=ax.transAxes)
     ax.text(0.10, 0.92, f"{poi}, {h7v}", size=14, transform=ax.transAxes)
     fig.subplots_adjust(left=0.45, bottom=0.085, top=0.915, right=0.975)
@@ -196,7 +247,7 @@ def shotgun_2j1b(poi, h7v):
 
 
 def shotgun_2j2b(poi, h7v):
-    os.chdir(f"/Users/ddavis/20200806/{h7v}")
+    os.chdir(f"/Users/ddavis/Desktop/20200806/{h7v}")
     setups = [
         "asimov",
         "asimov_2j2b",
@@ -208,7 +259,10 @@ def shotgun_2j2b(poi, h7v):
         "data_only17",
         "data_only18",
     ]
-    nps = sorted([tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups], key=lambda n: n.post_max)
+    nps = sorted(
+        [tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups],
+        key=lambda n: n.post_max,
+    )
     os.chdir(starting_dir)
     df = tr.nuispar_impact_plot_df(nps)
     ys = np.array(df.ys)
@@ -221,7 +275,15 @@ def shotgun_2j2b(poi, h7v):
     ax2.legend(loc="lower left", bbox_to_anchor=(-0.75, -0.09))
     ax2.set_xlabel(r"$\Delta\mu$", labelpad=25)
     ax.set_xlabel(r"$(\hat{\theta}-\theta_0)/\Delta\theta$", labelpad=20)
-    ax.text(0.10, 0.95, "ATLAS", fontstyle="italic", fontweight="bold", size=14, transform=ax.transAxes)
+    ax.text(
+        0.10,
+        0.95,
+        "ATLAS",
+        fontstyle="italic",
+        fontweight="bold",
+        size=14,
+        transform=ax.transAxes,
+    )
     ax.text(0.37, 0.95, "Internal", size=14, transform=ax.transAxes)
     ax.text(0.10, 0.92, f"{poi}, {h7v}", size=14, transform=ax.transAxes)
     fig.subplots_adjust(left=0.45, bottom=0.085, top=0.915, right=0.975)
@@ -233,7 +295,7 @@ def shotgun_2j2b(poi, h7v):
 
 
 def shotgun_nm(poi, h7v):
-    os.chdir(f"/Users/ddavis/20200806/{h7v}")
+    os.chdir(f"/Users/ddavis/Desktop/20200806/{h7v}")
     setups = [
         "asimov",
         "asimov_1j1b",
@@ -251,7 +313,10 @@ def shotgun_nm(poi, h7v):
         "data_only17",
         "data_only18",
     ]
-    nps = sorted([tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups], key=lambda n: n.post_max)
+    nps = sorted(
+        [tr.nuispar_impact(f"rpcc_main_{s}/tW", poi, s) for s in setups],
+        key=lambda n: n.post_max,
+    )
     os.chdir(starting_dir)
     df = tr.nuispar_impact_plot_df(nps)
     ys = np.array(df.ys)
@@ -264,7 +329,15 @@ def shotgun_nm(poi, h7v):
     ax2.legend(loc="lower left", bbox_to_anchor=(-0.75, -0.09))
     ax2.set_xlabel(r"$\Delta\mu$", labelpad=25)
     ax.set_xlabel(r"$(\hat{\theta}-\theta_0)/\Delta\theta$", labelpad=20)
-    ax.text(0.10, 0.95, "ATLAS", fontstyle="italic", fontweight="bold", size=14, transform=ax.transAxes)
+    ax.text(
+        0.10,
+        0.95,
+        "ATLAS",
+        fontstyle="italic",
+        fontweight="bold",
+        size=14,
+        transform=ax.transAxes,
+    )
     ax.text(0.37, 0.95, "Internal", size=14, transform=ax.transAxes)
     ax.text(0.10, 0.92, f"{poi}, {h7v}", size=14, transform=ax.transAxes)
     fig.subplots_adjust(left=0.45, bottom=0.085, top=0.915, right=0.975)
