@@ -24,6 +24,11 @@ ws713_data = "/Users/ddavis/20200806/h713/rpcc_main_data/tW"
 print(tr.delta_mu(ws704, ws713))
 print(tr.delta_mu(ws704_data, ws713_data))
 
+print(tr.delta_mu(ws704_data, ws713_data, poi_name="mu_ttbar"))
+
+
+
+
 nps = sorted([
     tr.nuispar_impact(ws704, "ttbar_PS_1j1b", "h704 ttbar PS 1j1b"),
     tr.nuispar_impact(ws713, "ttbar_PS_1j1b", "h713 ttbar PS 1j1b"),
