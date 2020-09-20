@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from dataclasses import dataclass
-
 from tdub.frames import raw_dataframe
 from tdub.data import quick_files
 from tdub.art import setup_tdub_style, draw_atlas_label
@@ -34,7 +32,6 @@ class Comparison:
     @property
     def template_max(self):
         return np.amax([self.up, self.down])
-
 
 
 def onesidedsym_comparison(nominal, up):
@@ -81,25 +78,20 @@ def drds_comparison(dr_counts, ds_counts, edges):
     axr.set_xlabel("BDT Response", horizontalalignment="right", x=1.0)
 
     fig.subplots_adjust(left=0.15)
-    draw_atlas_label(ax, follow="Simulation Internal")
+    draw_atlas_label(ax, follow="Simulation Internal", follow_shift=0.17)
     return fig, ax, axr
 
 
-@click.group(context_settings=dict(max_content_width=82))
-def cli():
-    pass
-
-
-@cli.command("bdt-cut-plots", context_settings=dict(max_content_width=92))
+@click.command("bdt-cut-plots")
 @click.argument("source", type=click.Path(exists=True))
 @click.option("--branch", type=str, default="bdtres03", help="BDT branch")
 @click.option("--lo-1j1b", type=float, default=0.35, help="Low end 1j1b BDT cut")
 @click.option("--hi-2j1b", type=float, default=0.70, help="High end 2j1b BDT cut")
 @click.option("--lo-2j2b", type=float, default=0.45, help="Low end 2j2b BDT cut")
 @click.option("--hi-2j2b", type=float, default=0.775, help="High end 2j2b BDT cut")
-@click.option("--bins-1j1b", type=(int, float, float), default=(15, 0.2, 0.80), help="Binning (n, min, max) of 1j1b bins")
-@click.option("--bins-2j1b", type=(int, float, float), default=(15, 0.2, 0.85), help="Binning (n, min, max) of 2j1b bins")
-@click.option("--bins-2j2b", type=(int, float, float), default=(15, 0.2, 0.90), help="Binning (n, min, max) of 2j2b bins")
+@click.option("--bins-1j1b", type=(int, float, float), default=(16, 0.2, 0.75), help="Binning (n, min, max) of 1j1b bins")
+@click.option("--bins-2j1b", type=(int, float, float), default=(16, 0.2, 0.85), help="Binning (n, min, max) of 2j1b bins")
+@click.option("--bins-2j2b", type=(int, float, float), default=(16, 0.2, 0.90), help="Binning (n, min, max) of 2j2b bins")
 def bdt_cut_plots(
     source,
     branch,
@@ -191,9 +183,5 @@ def bdt_cut_plots(
     plt.close(fig)
 
 
-def run_cli():
-    cli()
-
-
 if __name__ == "__main__":
-    run_cli()
+    bdt_cut_plots()
