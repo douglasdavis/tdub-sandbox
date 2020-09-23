@@ -13,11 +13,12 @@ import tdub.rex as tr
 from tdub.art import draw_impact_barh
 
 
-starting_dir = PosixPath.cwd()
+STARTING_DIR = PosixPath.cwd()
+FITS_DIR = "/ddd/atlas/analysis/run/fitting/standards"
 
-ws704 = "/Users/ddavis/Desktop/standardfits/704/rexpy-condor-main/tW"
-ws713 = "/Users/ddavis/Desktop/standardfits/713/rexpy-condor-main/tW"
 
+ws704 = f"{FITS_DIR}/704/rexpy-condor-main/tW"
+ws713 = f"{FITS_DIR}/713/rexpy-condor-main/tW"
 
 nps = sorted(
     [
@@ -141,7 +142,7 @@ del fig, ax, ax2
 
 
 def r1j1b(poi, h7v):
-    os.chdir(f"/Users/ddavis/Desktop/standardfits/{h7v}")
+    os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
         ("main", "Complete"),
         ("main_1j1b", "1j1b Only"),
@@ -152,7 +153,7 @@ def r1j1b(poi, h7v):
         ("main_only18", "2018/MC16e only"),
     ])
     nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
-    os.chdir(starting_dir)
+    os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.5))
     ax, ax2 = draw_impact_barh(ax, df)
@@ -186,7 +187,7 @@ def r1j1b(poi, h7v):
 
 
 def r2j1b(poi, h7v):
-    os.chdir(f"/Users/ddavis/Desktop/standardfits/{h7v}")
+    os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
         ("main", "Complete"),
         ("main_2j1b", "2j1b Only"),
@@ -196,7 +197,7 @@ def r2j1b(poi, h7v):
         ("main_only18", "2018/MC16e only"),
     ])
     nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
-    os.chdir(starting_dir)
+    os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.25))
     ax, ax2 = draw_impact_barh(ax, df)
@@ -230,7 +231,7 @@ def r2j1b(poi, h7v):
 
 
 def r2j2b(poi, h7v):
-    os.chdir(f"/Users/ddavis/Desktop/standardfits/{h7v}")
+    os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
         ("main", "Complete"),
         ("main_2j2b", "2j2b Only"),
@@ -240,7 +241,7 @@ def r2j2b(poi, h7v):
         ("main_only18", "2018/MC16e only"),
     ])
     nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
-    os.chdir(starting_dir)
+    os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.25))
     ax, ax2 = draw_impact_barh(ax, df)
@@ -274,7 +275,7 @@ def r2j2b(poi, h7v):
 
 
 def norm_mig(poi, h7v):
-    os.chdir(f"/Users/ddavis/Desktop/standardfits/{h7v}")
+    os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
         ("main", "Complete"),
         ("main_1j1b", "1j1b Only"),
@@ -287,7 +288,7 @@ def norm_mig(poi, h7v):
         ("main_only18", "2018/MC16e only"),
     ])
     nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
-    os.chdir(starting_dir)
+    os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.5))
     ax, ax2 = draw_impact_barh(ax, df)
