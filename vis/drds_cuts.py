@@ -63,7 +63,7 @@ def drds_comparison(dr_counts, ds_counts, edges):
 
     ax.hist(centers, bins=edges, weights=c.up, color="red", histtype="step", label=r"$+1\sigma$ Variation")
     ax.hist(centers, bins=edges, weights=c.down, color="blue", histtype="step", label=r"$-1\sigma$ Variation")
-    ax.hist(centers, bins=edges, weights=c.nominal, color="black", histtype="step", label="Nominal Template")
+    ax.hist(centers, bins=edges, weights=c.nominal, color="black", histtype="step", label="Nominal")
     ymax = c.template_max * 1.6
     ax.set_ylim([0, ymax])
     ax.set_ylabel("Number of Events", horizontalalignment="right", y=1.0)
@@ -89,9 +89,9 @@ def drds_comparison(dr_counts, ds_counts, edges):
 @click.option("--hi-2j1b", type=float, default=0.70, help="High end 2j1b BDT cut")
 @click.option("--lo-2j2b", type=float, default=0.45, help="Low end 2j2b BDT cut")
 @click.option("--hi-2j2b", type=float, default=0.775, help="High end 2j2b BDT cut")
-@click.option("--bins-1j1b", type=(int, float, float), default=(16, 0.2, 0.75), help="Binning (n, min, max) of 1j1b bins")
-@click.option("--bins-2j1b", type=(int, float, float), default=(16, 0.2, 0.85), help="Binning (n, min, max) of 2j1b bins")
-@click.option("--bins-2j2b", type=(int, float, float), default=(16, 0.2, 0.90), help="Binning (n, min, max) of 2j2b bins")
+@click.option("--bins-1j1b", type=(int, float, float), default=(18, 0.2, 0.75), help="Binning (n, min, max) of 1j1b bins")
+@click.option("--bins-2j1b", type=(int, float, float), default=(18, 0.2, 0.85), help="Binning (n, min, max) of 2j1b bins")
+@click.option("--bins-2j2b", type=(int, float, float), default=(18, 0.2, 0.90), help="Binning (n, min, max) of 2j2b bins")
 def bdt_cut_plots(
     source,
     branch,
