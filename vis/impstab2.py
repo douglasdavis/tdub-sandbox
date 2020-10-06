@@ -14,11 +14,11 @@ from tdub.art import draw_impact_barh
 
 
 STARTING_DIR = PosixPath.cwd()
-FITS_DIR = "/ddd/atlas/analysis/run/fitting/standards"
+FITS_DIR = "/opt/spar/atlas/analysis/run/fitting/202009/03/core"
 
 
-ws704 = f"{FITS_DIR}/704/rexpy-condor-main/tW"
-ws713 = f"{FITS_DIR}/713/rexpy-condor-main/tW"
+ws704 = f"{FITS_DIR}/704/main.d/tW"
+ws713 = f"{FITS_DIR}/713/main.d/tW"
 
 nps = sorted(
     [
@@ -144,15 +144,15 @@ del fig, ax, ax2
 def r1j1b(poi, h7v):
     os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
-        ("main", "Complete"),
-        ("main_1j1b", "1j1b Only"),
-        ("main_1j1b2j1b", "1j1b + 2j1b"),
-        ("main_1j1b2j2b", "1j1b + 2j2b"),
-        ("main_only1516", "201(5,6)/MC16a only"),
-        ("main_only17", "2017/MC16d only"),
-        ("main_only18", "2018/MC16e only"),
+        ("main.d", "Complete"),
+        ("main_1j1b.d", "1j1b Only"),
+        ("main_1j1b2j1b.d", "1j1b + 2j1b"),
+        ("main_1j1b2j2b.d", "1j1b + 2j2b"),
+        ("main_only1516.d", "201(5,6)/MC16a only"),
+        ("main_only17.d", "2017/MC16d only"),
+        ("main_only18.d", "2018/MC16e only"),
     ])
-    nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
+    nps = [tr.nuispar_impact(f"{sd}/tW", poi, sl) for sd, sl in configs]
     os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.5))
@@ -189,14 +189,14 @@ def r1j1b(poi, h7v):
 def r2j1b(poi, h7v):
     os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
-        ("main", "Complete"),
-        ("main_2j1b", "2j1b Only"),
-        ("main_1j1b2j1b", "1j1b + 2j1b"),
-        ("main_only1516", "201(5,6)/MC16a only"),
-        ("main_only17", "2017/MC16d only"),
-        ("main_only18", "2018/MC16e only"),
+        ("main.d", "Complete"),
+        ("main_2j1b.d", "2j1b Only"),
+        ("main_1j1b2j1b.d", "1j1b + 2j1b"),
+        ("main_only1516.d", "201(5,6)/MC16a only"),
+        ("main_only17.d", "2017/MC16d only"),
+        ("main_only18.d", "2018/MC16e only"),
     ])
-    nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
+    nps = [tr.nuispar_impact(f"{sd}/tW", poi, sl) for sd, sl in configs]
     os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.25))
@@ -233,14 +233,14 @@ def r2j1b(poi, h7v):
 def r2j2b(poi, h7v):
     os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
-        ("main", "Complete"),
-        ("main_2j2b", "2j2b Only"),
-        ("main_1j1b2j2b", "1j1b + 2j2b"),
-        ("main_only1516", "201(5,6)/MC16a only"),
-        ("main_only17", "2017/MC16d only"),
-        ("main_only18", "2018/MC16e only"),
+        ("main.d", "Complete"),
+        ("main_2j2b.d", "2j2b Only"),
+        ("main_1j1b2j2b.d", "1j1b + 2j2b"),
+        ("main_only1516.d", "201(5,6)/MC16a only"),
+        ("main_only17.d", "2017/MC16d only"),
+        ("main_only18.d", "2018/MC16e only"),
     ])
-    nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
+    nps = [tr.nuispar_impact(f"{sd}/tW", poi, sl) for sd, sl in configs]
     os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.25))
@@ -277,17 +277,17 @@ def r2j2b(poi, h7v):
 def norm_mig(poi, h7v):
     os.chdir(f"{FITS_DIR}/{h7v}")
     configs = reversed([
-        ("main", "Complete"),
-        ("main_1j1b", "1j1b Only"),
-        ("main_2j1b", "2j1b Only"),
-        ("main_2j2b", "2j2b Only"),
-        ("main_1j1b2j1b", "1j1b + 2j1b"),
-        ("main_1j1b2j2b", "1j1b + 2j2b"),
-        ("main_only1516", "201(5,6)/MC16a only"),
-        ("main_only17", "2017/MC16d only"),
-        ("main_only18", "2018/MC16e only"),
+        ("main.d", "Complete"),
+        ("main_1j1b.d", "1j1b Only"),
+        ("main_2j1b.d", "2j1b Only"),
+        ("main_2j2b.d", "2j2b Only"),
+        ("main_1j1b2j1b.d", "1j1b + 2j1b"),
+        ("main_1j1b2j2b.d", "1j1b + 2j2b"),
+        ("main_only1516.d", "201(5,6)/MC16a only"),
+        ("main_only17.d", "2017/MC16d only"),
+        ("main_only18.d", "2018/MC16e only"),
     ])
-    nps = [tr.nuispar_impact(f"rexpy-condor-{sd}/tW", poi, sl) for sd, sl in configs]
+    nps = [tr.nuispar_impact(f"{sd}/tW", poi, sl) for sd, sl in configs]
     os.chdir(STARTING_DIR)
     df = tr.nuispar_impact_plot_df(nps)
     fig, ax = plt.subplots(figsize=(4, 5.5))
